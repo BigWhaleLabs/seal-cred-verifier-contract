@@ -1,0 +1,28 @@
+build/*
+!build/.gitkeep
+
+.env
+coverage
+coverage.json
+typechain
+typechain-types
+
+#Hardhat files
+cache
+artifacts
+
+.DS_Store
+node_modules
+
+pot/pot24_final.ptau
+pot/OwnershipChecker_0000.zkey
+pot/OwnershipChecker_final.zkey
+
+# yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
