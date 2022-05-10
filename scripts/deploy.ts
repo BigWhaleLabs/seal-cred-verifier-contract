@@ -23,11 +23,7 @@ async function main() {
   await new Promise((resolve) => setTimeout(resolve, 60000))
 
   await run('verify:verify', {
-    address: contract.address,
-    constructorArguments: [
-      dosuInvitesAddress,
-      sealCredLedgerAddress
-    ]
+    address: "0x179229a0d27E97e98F1d7474001a5C154c2d3566",
   })
 
   console.log('✅ SealCred Verifier contract verified on Etherscan')
