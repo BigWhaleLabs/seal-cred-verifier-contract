@@ -2,31 +2,43 @@ import { ethers, run } from 'hardhat'
 
 async function main() {
   const [deployer] = await ethers.getSigners()
-
+  // Deploy the contract
   console.log('Deploying contracts with the account:', deployer.address)
   console.log('Account balance:', (await deployer.getBalance()).toString())
-
-  const dosuInvitesAddress = '0x32664A3CD741822d127b00BBCBBAD5e3E857B83A'
-  const sealCredLedgerAddress = '0xAD8ab3705d9020a5fe9e2D3790E74E8BC56651A1'
-
-  const factory = await ethers.getContractFactory('Verifier')
-  const contract = await factory.deploy()
-
-  console.log('Deploy tx gas price:', contract.deployTransaction.gasPrice)
-  console.log('Deploy tx gas limit:', contract.deployTransaction.gasLimit)
-
-  await contract.deployed()
-
-  console.log('✅ SealCred Verifier deployed to:', contract.address)
-
-  console.log('Wait for 1 minute')
-  await new Promise((resolve) => setTimeout(resolve, 60000))
-
-  await run('verify:verify', {
-    address: "0x179229a0d27E97e98F1d7474001a5C154c2d3566",
-  })
-
-  console.log('✅ SealCred Verifier contract verified on Etherscan')
+  const provider = ethers.provider
+  const { chainId } = await provider.getNetwork()
+  const chains = {
+    1: 'mainnet',
+    3: 'ropsten',
+    4: 'rinkeby',
+  } as { [chainId: number]: string }
+  const chainName = chains[chainId]
+  const Verifier = await ethers.getContractFactory('Verifier')
+  const verifier = await Verifier.deploy()
+  console.log('Deploy tx gas price:', verifier.deployTransaction.gasPrice)
+  console.log('Deploy tx gas limit:', verifier.deployTransaction.gasLimit)
+  await verifier.deployed()
+  const address = verifier.address
+  console.log('Contract deployed to:', address)
+  console.log('Wait for 1 minute to make sure blockchain is updated')
+  await new Promise((resolve) => setTimeout(resolve, 60 * 1000))
+  // Try to verify the contract on Etherscan
+  try {
+    await run('verify:verify', {
+      address,
+    })
+  } catch (err) {
+    console.log('Error verifiying contract on Etherscan:', err)
+  }
+  // Print out the information
+  console.log('Verifier deployed and verified on Etherscan!')
+  console.log('Contract address:', address)
+  console.log(
+    'Etherscan URL:',
+    `https://${
+      chainName !== 'mainnet' ? `${chainName}.` : ''
+    }etherscan.io/address/${address}`
+  )
 }
 
 main().catch((error) => {

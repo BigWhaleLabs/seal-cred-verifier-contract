@@ -1,19 +1,19 @@
-build/*
-!build/.gitkeep
-
+node_modules
 .env
 coverage
 coverage.json
 typechain
-typechain-types
+.DS_Store
+dist
 
-#Hardhat files
+# Hardhat files
 cache
 artifacts
 
-.DS_Store
-node_modules
+# logs
+*.log
 
+# PoT files
 pot/pot24_final.ptau
 pot/OwnershipChecker_0000.zkey
 pot/OwnershipChecker_final.zkey

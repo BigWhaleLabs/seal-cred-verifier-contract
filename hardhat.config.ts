@@ -1,19 +1,29 @@
 import * as dotenv from 'dotenv'
 import { cleanEnv, str } from 'envalid'
-import { HardhatUserConfig } from 'hardhat/config'
+import { HardhatUserConfig, subtask } from 'hardhat/config'
+import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/task-names'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
 import '@typechain/hardhat'
 import 'hardhat-gas-reporter'
 import 'solidity-coverage'
 
+// Task for exluding mock contracts
+subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(
+  async (_, __, runSuper) => {
+    const paths = await runSuper()
+
+    return paths.filter((p) => !p.endsWith('.t.sol'))
+  }
+)
+
 dotenv.config()
 
-const { CONTRACT_OWNER_PRIVATE_KEY, ROPSTEN_RPC_URL, ETHERSCAN_API_KEY } = cleanEnv(
+const { CONTRACT_OWNER_PRIVATE_KEY, RPC_URL, ETHERSCAN_API_KEY } = cleanEnv(
   process.env,
   {
     CONTRACT_OWNER_PRIVATE_KEY: str(),
-    ROPSTEN_RPC_URL: str(),
+    RPC_URL: str(),
     ETHERSCAN_API_KEY: str(),
   }
 )
@@ -29,8 +39,8 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    ropsten: {
-      url: ROPSTEN_RPC_URL,
+    deploy: {
+      url: RPC_URL,
       accounts: [CONTRACT_OWNER_PRIVATE_KEY],
     },
     local: {
