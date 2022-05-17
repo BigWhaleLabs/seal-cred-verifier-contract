@@ -54,7 +54,7 @@ yarn snarkjs groth16 verify pot/verification_key.json build/public.json build/pr
 
 # Smart contract commands
 # Export the verifier as a smart contract
-yarn snarkjs zkey export solidityverifier pot/MerkleTreeChecker_final.zkey build/Verifier.sol
+yarn snarkjs zkey export solidityverifier pot/MerkleTreeChecker_final.zkey contracts/Verifier.sol
 
 # Create the solidity call data with the existing public.json and proof.json
 # snarkjs zkey export soliditycalldata public.json proof.json
