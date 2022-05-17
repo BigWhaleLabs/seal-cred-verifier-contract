@@ -10,10 +10,10 @@ Verifies a ZK proof of the following two claims:
 1. Clone the repository with `git clone git@github.com:BigWhaleLabs/seal-cred-verifier-contract.git`
 2. Install the dependencies with `yarn`
 3. Add environment variables to your `.env` file
-4. Run the scripts below
-5. Run `yarn download-ptau` to download ptau for proving
-6. Run `yarn prove` to compile the circom circuits, create proof, verify proof, exports verifier as a solidity Verifier.sol
-7. Run `yarn compile` to compile the contract
+4. Run `yarn download-ptau` to download ptau for proving
+5. Run `yarn prove` to compile the circom circuits, create proof, verify proof, exports verifier as a solidity Verifier.sol
+6. Run `yarn compile` to compile the contract
+7. Run the scripts below for different commands
 
 ## Environment variables
 
