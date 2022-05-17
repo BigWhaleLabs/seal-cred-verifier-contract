@@ -6,28 +6,27 @@ async function main() {
   console.log('Deploying contracts with the account:', deployer.address)
   console.log('Account balance:', (await deployer.getBalance()).toString())
 
-  const dosuInvitesAddress = '0x399f4a0a9d6E8f6f4BD019340e4d1bE0C9a742F0'
-  const sealCredLedgerAddress = '0x6d638815402a6B2085ad9d6327C27d7796628851'
+  const dosuInvitesAddress = '0x32664A3CD741822d127b00BBCBBAD5e3E857B83A'
+  const sealCredLedgerAddress = '0xAD8ab3705d9020a5fe9e2D3790E74E8BC56651A1'
 
-  const factory = await ethers.getContractFactory('SealCredDerivative')
-  const contract = await factory.deploy(dosuInvitesAddress, sealCredLedgerAddress)
+  const factory = await ethers.getContractFactory('Verifier')
+  const contract = await factory.deploy()
+
+  console.log('Deploy tx gas price:', contract.deployTransaction.gasPrice)
+  console.log('Deploy tx gas limit:', contract.deployTransaction.gasLimit)
 
   await contract.deployed()
 
-  console.log('✅ SealCred Derivative deployed to:', contract.address)
+  console.log('✅ SealCred Verifier deployed to:', contract.address)
 
   console.log('Wait for 1 minute')
   await new Promise((resolve) => setTimeout(resolve, 60000))
 
   await run('verify:verify', {
-    address: contract.address,
-    constructorArguments: [
-      dosuInvitesAddress,
-      sealCredLedgerAddress
-    ]
+    address: "0x179229a0d27E97e98F1d7474001a5C154c2d3566",
   })
 
-  console.log('✅ SealCred Derivative verified')
+  console.log('✅ SealCred Verifier contract verified on Etherscan')
 }
 
 main().catch((error) => {
