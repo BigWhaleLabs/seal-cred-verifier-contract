@@ -29,7 +29,6 @@
     "release": "np",
     "prepublishOnly": "yarn compile && yarn tsc",
     "prove": "scripts/prove.sh",
-    "setup-proofs": "scripts/setup-proofs.sh",
     "download-ptau": "scripts/download-ptau.sh"
   },
   "devDependencies": {
