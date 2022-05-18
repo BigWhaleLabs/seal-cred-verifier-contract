@@ -17,11 +17,11 @@ Verifies a ZK proof of the following two claims:
 
 ## Environment variables
 
-| Name                         | Description                       |
-| ---------------------------- | --------------------------------- |
-| `ETHERSCAN_API_KEY`          | Etherscan API key                 |
-| `RPC_URL`                    | Ethereum RPC URL                  |
-| `CONTRACT_OWNER_PRIVATE_KEY` | Private key of the contract owner |
+| Name                         | Description                                   |
+| ---------------------------- | --------------------------------------------- |
+| `ETHERSCAN_API_KEY`          | Etherscan API key                             |
+| `RPC_URL`                    | Ethereum RPC URL (defaults to @bwl/constants) |
+| `CONTRACT_OWNER_PRIVATE_KEY` | Private key of the contract owner             |
 
 Also check out the `.env.example` file for more information.
 
