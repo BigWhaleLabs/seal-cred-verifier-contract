@@ -1,6 +1,6 @@
-import { expect } from 'chai';
-import { Contract } from 'ethers';
-import { ethers } from 'hardhat';
+import { expect } from 'chai'
+import { Contract } from 'ethers'
+import { ethers } from 'hardhat'
 
 const VALID_PROOF = {
   a: [
@@ -25,7 +25,7 @@ const VALID_PROOF = {
     '0x0000000000000000000000000000000000000000000000000000000000000001',
     '0x0d41fba73f0dcde45a3683b4c16a32c1f0793268b3cfb01c8a1115aefc76da04',
   ],
-};
+}
 const INVALID_PROOF = {
   a: VALID_PROOF.a,
   b: VALID_PROOF.b,
@@ -34,27 +34,27 @@ const INVALID_PROOF = {
     '0x0000000000000000000000000000000000000000000000000000000000000001',
     '0x0c98cad99f5ca1a87907e7852add432668a4de09afe0f726650e4f42bb63e14d',
   ],
-};
+}
 
 describe('Verifier contract', function () {
-  let contract: Contract;
+  let contract: Contract
 
   before(async () => {
-    const factory = await ethers.getContractFactory('Verifier');
-    contract = await factory.deploy();
+    const factory = await ethers.getContractFactory('Verifier')
+    contract = await factory.deploy()
 
-    await contract.deployed();
-  });
-
-  it('should successfully verify proof', async () => {
-    const { a, b, c, input } = VALID_PROOF;
-
-    expect(await contract.verifyProof(a, b, c, input)).to.be.equal(true);
-  });
+    await contract.deployed()
+  })
 
   it('should successfully verify proof', async () => {
-    const { a, b, c, input } = INVALID_PROOF;
+    const { a, b, c, input } = VALID_PROOF
 
-    expect(await contract.verifyProof(a, b, c, input)).to.be.equal(false);
-  });
-});
+    expect(await contract.verifyProof(a, b, c, input)).to.be.equal(true)
+  })
+
+  it('should successfully verify proof', async () => {
+    const { a, b, c, input } = INVALID_PROOF
+
+    expect(await contract.verifyProof(a, b, c, input)).to.be.equal(false)
+  })
+})
