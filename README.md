@@ -1,47 +1,38 @@
-# seal-cred-verifier-contract
+# Verifier contract
 
-# Commands
+Verifies a ZK proof of the following two claims:
 
-Hardhat set-up
+1. Prover owns an Ethereum address (the signature is valid)
+2. This Ethereum address is a part of the given Merkle tree
 
-```shell
-npm install --save-dev hardhat
-npx hardhat
-```
+## Usage
 
-circomlib installation
+1. Clone the repository with `git clone git@github.com:BigWhaleLabs/seal-cred-verifier-contract.git`
+2. Install the dependencies with `yarn`
+3. Add environment variables to your `.env` file
+4. Run `yarn download-ptau` to download ptau for proving
+5. Run `yarn prove` to compile the circom circuits, create proof, verify proof, exports verifier as a solidity Verifier.sol
+6. Run `yarn compile` to compile the contract
+7. Run the scripts below for different commands
 
-```shell
-npm i circomlib
-```
+## Environment variables
 
-Steps to set up merkle tree and ecdsa:
+| Name                         | Description                       |
+| ---------------------------- | --------------------------------- |
+| `ETHERSCAN_API_KEY`          | Etherscan API key                 |
+| `RPC_URL`                    | Ethereum RPC URL                  |
+| `CONTRACT_OWNER_PRIVATE_KEY` | Private key of the contract owner |
 
-1. Run `yarn`
-2. Generate input.json by creating MerkleTree and ECDSA inputs. Generate root, leaf, pathIndices, siblings from [`seal-cred-derivatives-contract/merkle-tree-generator`](https://github.com/BigWhaleLabs/seal-cred-derivatives-contract-verifier) and paste into `input.json`. Genereate r, s, msghash, pubkey by running
+Also check out the `.env.example` file for more information.
 
-```
-yarn generate-ecdsa
-```
+## Available scripts
 
-and paste the `inputs/input_verify0.json` into `input.json`
-
-3. Run
-
-```
-yarn verify-proof
-```
-
-If running into memory problems (node):
-
-```
-export NODE_OPTIONS=--max_old_space_size=196608
-```
-
-If running into memory problems (OS): Add the below line to `/etc/sysctl.conf`
-
-```
-vm.max_map_count=196608
-```
-
-It took 2.5-3 hours to finish verify proof on a 24 vCPU, 192GB RAM, 600GB disk server.
+- `yarn compile` — compiles the contract ts interface to the `typechain` directory
+- `yarn test` — runs the test suite
+- `yarn deploy` — deploys the contract to the network
+- `yarn eth-lint` — runs the linter for the solidity contract
+- `yarn lint` — runs all the linters
+- `yarn prettify` — prettifies the code in th project
+- `yarn release` — relases the `typechain` directory to NPM
+- `yarn prove` - compiles the circom circuits, creates proof, verifies proof, exports verifier as a solidity Verifier.sol
+- `yarn download-ptau` - downloads the required pot24_final.ptau
