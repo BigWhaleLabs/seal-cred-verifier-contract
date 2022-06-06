@@ -14,6 +14,7 @@ template ERC721OwnershipChecker(messageLength) {
 
     // TODO: check validity of EdDSA signature
     // TODO: check that EdDSA signature was signed by the public key of the attestor
+    // TODO: check if the message ends with 'owns-${tokenAddress}'
     // TODO: write the result into the result signal
 }
 
