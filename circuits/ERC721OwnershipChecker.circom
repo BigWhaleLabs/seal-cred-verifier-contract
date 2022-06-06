@@ -13,7 +13,7 @@ include "../ecdsa-circuits/ecdsa.circom";
 include "../ecdsa-circuits/ecdsa_func.circom";
 include "../ecdsa-circuits/secp256k1_func.circom";
 
-template MerkleTreeChecker(nLevels, n, k) {
+template ERC721OwnershipChecker(nLevels, n, k) {
     assert(k >= 2);
     assert(k <= 100);
 
