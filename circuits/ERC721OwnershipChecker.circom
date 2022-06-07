@@ -7,10 +7,9 @@ template ERC721OwnershipChecker() {
   for (var i = 0; i < 42; i++) {
     message[48 + i] === tokenAddress[i];
   }
-  // Attestor address checking
-  signal input attestorPublicKey;
-  log(attestorPublicKey);
+  
   // EdDSA signature
+  // TODO: check validity of EdDSA signature
   // signal input attestorPublicKey[32]; // TODO: figure out the size
   // signal input A[256];
   // signal input R8[256];
@@ -19,9 +18,15 @@ template ERC721OwnershipChecker() {
   // signal output result;
   // result <== tokenAddress;
 
-  // TODO: check validity of EdDSA signature
+
+  // Attestor address checking
   // TODO: check that EdDSA signature was signed by the public key of the attestor
+  signal input attestorPublicKey;
+  log(attestorPublicKey);
+
+  // Result
   // TODO: write the result into the result signal
+  signal output result;
 
   // DEBUG (have to add it because we need at least 1 output)
   signal input a;
