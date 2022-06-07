@@ -23,8 +23,7 @@ template ERC721OwnershipChecker() {
     // DEBUG
     signal input a;
     signal input b;
-    signal output c;
-    c <== a * b;  
+    signal output c <== a * b;
 }
 
 component main{public [a]} = ERC721OwnershipChecker();
