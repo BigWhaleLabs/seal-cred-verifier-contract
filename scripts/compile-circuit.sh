@@ -1,20 +1,22 @@
 #!/bin/sh
 set -e
 
-# Phase 2
-# circuit-specific stuff
+# Util function for logging
+starEcho () {
+  echo "**** $1 ****"
+}
 
 # Compile the circuit
-echo "****COMPILING CIRCUIT****"
+starEcho "COMPILING CIRCUIT"
 circom circuits/ERC721OwnershipChecker.circom --r1cs --wasm --sym --c -o build
 
 # Generate witness
-echo "****GENERATING WITNESS FOR SAMPLE INPUT****"
-node build/ERC721OwnershipChecker_js/generate_witness.js build/ERC721OwnershipChecker_js/ERC721OwnershipChecker.wasm input.json build/witness.wtns
+starEcho "GENERATING WITNESS FOR SAMPLE INPUT"
+node build/ERC721OwnershipChecker_js/generate_witness.js build/ERC721OwnershipChecker_js/ERC721OwnershipChecker.wasm inputs/input.json build/witness.wtns
 
-# Setup (use plonk so we can skip ptau phase 2, generate zkey 0000
-echo "****GENERATING ZKEY 0000****"
-yarn snarkjs groth16 setup build/ERC721OwnershipChecker.r1cs pot/pot24_final.ptau pot/OwnershipChecker_0000.zkey
+# Generate zkey 0000
+starEcho "GENERATING ZKEY 0000"
+yarn snarkjs groth16 setup build/ERC721OwnershipChecker.r1cs pot/pot12_final.ptau pot/ERC721OwnershipChecker_0000.zkey
 
 # Generate reference zkey
 # yarn snarkjs zkey new build/ERC721OwnershipChecker.r1cs pot/pot24_final.ptau pot/ERC721OwnershipChecker_0000.zkey
@@ -31,25 +33,25 @@ yarn snarkjs groth16 setup build/ERC721OwnershipChecker.r1cs pot/pot24_final.pta
 # yarn snarkjs zkey verify build/ERC721OwnershipChecker.r1cs pot/pot24_final.ptau pot/ERC721OwnershipChecker_0001.zkey
 
 # Apply random beacon as before
-echo "****GENERATING FINAL ZKEY****"
-yarn snarkjs zkey beacon pot/OwnershipChecker_0000.zkey pot/OwnershipChecker_final.zkey \
+starEcho "GENERATING FINAL ZKEY"
+yarn snarkjs zkey beacon pot/ERC721OwnershipChecker_0000.zkey pot/ERC721OwnershipChecker_final.zkey \
   0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f 10 -n="Final Beacon phase2"
 
 # Optional: verify final zkey
-echo "****VERIFYING FINAL ZKEY****"
-yarn snarkjs zkey verify build/ERC721OwnershipChecker.r1cs pot/pot24_final.ptau pot/OwnershipChecker_final.zkey
+starEcho "VERIFYING FINAL ZKEY"
+yarn snarkjs zkey verify build/ERC721OwnershipChecker.r1cs pot/pot12_final.ptau pot/ERC721OwnershipChecker_final.zkey
 
 # Export verification key
-echo "** Exporting vkey"
-yarn snarkjs zkey export verificationkey pot/OwnershipChecker_final.zkey pot/verification_key.json
+starEcho "Exporting vkey"
+yarn snarkjs zkey export verificationkey pot/ERC721OwnershipChecker_final.zkey pot/verification_key.json
 
 # Create the proof
-echo "****CREATING PROOF FOR SAMPLE INPUT****"
-yarn snarkjs groth16 prove pot/OwnershipChecker_final.zkey build/witness.wtns \
+starEcho "CREATING PROOF FOR SAMPLE INPUT"
+yarn snarkjs groth16 prove pot/ERC721OwnershipChecker_final.zkey build/witness.wtns \
   build/proof.json build/public.json
 
 # Verify the proof
-echo "****VERIFYING PROOF FOR SAMPLE INPUT****"
+starEcho "VERIFYING PROOF FOR SAMPLE INPUT"
 yarn snarkjs groth16 verify pot/verification_key.json build/public.json build/proof.json
 
 # Smart contract commands

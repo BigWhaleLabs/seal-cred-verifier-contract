@@ -1,10 +1,12 @@
-pragma circom 2.0.0;
+pragma circom 2.0.4;
 
-template ERC721OwnershipChecker(messageLength) {
+template ERC721OwnershipChecker() {
     // Message checking
     signal input message;
+    log(message);
     // signal input attestorPublicKey[32]; // TODO: figure out the size
     signal input tokenAddress;
+    log(tokenAddress);
     // EdDSA signature
     // signal input A[256];
     // signal input R8[256];
@@ -18,4 +20,4 @@ template ERC721OwnershipChecker(messageLength) {
     // TODO: write the result into the result signal
 }
 
-component main{public [tokenAddress]} = ERC721OwnershipChecker(90); // TODO: figure out the size
+component main{public [tokenAddress]} = ERC721OwnershipChecker();

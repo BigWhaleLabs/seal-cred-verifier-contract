@@ -1,9 +1,6 @@
 #!/bin/sh
 set -e
 
-# Phase 1
-# non-circuit-specific stuff
-
 # Starts Powers Of Tau ceremony, creating the file pot20_0000.ptau
 yarn snarkjs powersoftau new bn128 20 pot/pot20_0000.ptau -v
 
