@@ -1,6 +1,6 @@
 pragma circom 2.0.4;
 
-include "eddsamimc.circom";
+include "../circomlib/circuits/eddsamimc.circom";
 
 template ERC721OwnershipChecker() {
   // Message checking
