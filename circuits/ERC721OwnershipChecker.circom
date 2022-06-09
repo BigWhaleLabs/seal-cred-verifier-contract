@@ -28,15 +28,13 @@ template ERC721OwnershipChecker() {
   verifier.S <== S;
   verifier.M <== M;
 
-  // Check if the EdDSA' "M" is "message" hashed
-  // TODO: check that mimc7(message) is the same as M
+  // Check if the EdDSA's "M" is "message" hashed
   component mimc7 = MultiMiMC7(90, 91);
   mimc7.k <== 0;
   for (var i = 0; i < 90; i++) {
     mimc7.in[i] <== message[i];
   }
-  signal result <== mimc7.out;
-  log(result);
+  M === mimc7.out;
 }
 
 component main{public [tokenAddress, pubKeyX]} = ERC721OwnershipChecker();
