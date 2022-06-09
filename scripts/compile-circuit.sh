@@ -16,7 +16,7 @@ node build/ERC721OwnershipChecker_js/generate_witness.js build/ERC721OwnershipCh
 
 # Generate zkey 0000
 starEcho "GENERATING ZKEY 0000"
-yarn snarkjs groth16 setup build/ERC721OwnershipChecker.r1cs pot/pot14_final.ptau pot/ERC721OwnershipChecker_0000.zkey
+yarn snarkjs groth16 setup build/ERC721OwnershipChecker.r1cs pot/pot16_final.ptau pot/ERC721OwnershipChecker_0000.zkey
 
 # Generate reference zkey
 # yarn snarkjs zkey new build/ERC721OwnershipChecker.r1cs pot/pot24_final.ptau pot/ERC721OwnershipChecker_0000.zkey
@@ -39,7 +39,7 @@ yarn snarkjs zkey beacon pot/ERC721OwnershipChecker_0000.zkey pot/ERC721Ownershi
 
 # Optional: verify final zkey
 starEcho "VERIFYING FINAL ZKEY"
-yarn snarkjs zkey verify build/ERC721OwnershipChecker.r1cs pot/pot14_final.ptau pot/ERC721OwnershipChecker_final.zkey
+yarn snarkjs zkey verify build/ERC721OwnershipChecker.r1cs pot/pot16_final.ptau pot/ERC721OwnershipChecker_final.zkey
 
 # Export verification key
 starEcho "Exporting vkey"
