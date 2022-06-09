@@ -1,5 +1,7 @@
 pragma circom 2.0.4;
 
+include "eddsamimc.circom";
+
 template ERC721OwnershipChecker() {
   // Message checking
   signal input message[90];
@@ -7,17 +9,25 @@ template ERC721OwnershipChecker() {
   for (var i = 0; i < 42; i++) {
     message[48 + i] === tokenAddress[i];
   }
-  
-  // EdDSA signature
-  // TODO: check validity of EdDSA signature
-  // signal input attestorPublicKey[32]; // TODO: figure out the size
-  // signal input A[256];
-  // signal input R8[256];
-  // signal input S[256];
-  // Result
-  // signal output result;
-  // result <== tokenAddress;
 
+  // EdDSA signature
+  signal input from_x;
+  signal input from_y;
+  signal input R8x;
+  signal input R8y;
+  signal input S;
+  signal input M;
+  component verifier = EdDSAMiMCVerifier();
+  verifier.enabled <== 1;
+  verifier.Ax <== from_x;
+  verifier.Ay <== from_y;
+  verifier.R8x <== R8x;
+  verifier.R8y <== R8y;
+  verifier.S <== S;
+  verifier.M <== M;
+
+  // Message hash checking
+  // TODO: check that mimc7(message) is the same as M
 
   // Attestor address checking
   // TODO: check that EdDSA signature was signed by the public key of the attestor
