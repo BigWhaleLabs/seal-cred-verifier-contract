@@ -18,7 +18,7 @@ template ERC721OwnershipChecker() {
   signal input S;
   signal input M;
   component verifier = EdDSAMiMCVerifier();
-  verifier.enabled <== 1;
+  verifier.enabled <== 0;
   verifier.Ax <== from_x;
   verifier.Ay <== from_y;
   verifier.R8x <== R8x;
