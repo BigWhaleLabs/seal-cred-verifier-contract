@@ -27,7 +27,7 @@ Also check out the `.env.example` file for more information.
 
 ## Available scripts
 
-- `yarn compile` — compiles the contract ts interface to the `typechain` directory
+- `yarn build` — compiles the contract ts interface to the `typechain` directory
 - `yarn compile-circuit` - compiles the circom circuits, creates proof, verifies proof, exports verifier as a solidity Verifier.sol
 - `yarn test` — runs the test suite
 - `yarn deploy` — deploys the contract to the network
