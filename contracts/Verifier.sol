@@ -199,7 +199,7 @@ contract Verifier {
             [11502426145685875357967720478366491326865907869902181704031346886834786027007,
              21679208693936337484429571887537508926366191105267550375038502782696042114705]
         );
-        vk.IC = new Pairing.G1Point[](45);
+        vk.IC = new Pairing.G1Point[](46);
         
         vk.IC[0] = Pairing.G1Point( 
             9118825447890956997638716552249297677740399839666980940629129790683739865161,
@@ -426,6 +426,11 @@ contract Verifier {
             13570670874768823954015899205211429592709989488069936611512934888153845033146
         );                                      
         
+        vk.IC[45] = Pairing.G1Point( 
+            20582775170734444957460201841388569212398281710622351246747373694486836310923,
+            5303410044024776501332432823952580649534639172870534693714890684487659038268
+        );                                      
+        
     }
     function verify(uint[] memory input, Proof memory proof) internal view returns (uint) {
         uint256 snark_scalar_field = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
@@ -451,7 +456,7 @@ contract Verifier {
             uint[2] memory a,
             uint[2][2] memory b,
             uint[2] memory c,
-            uint[44] memory input
+            uint[45] memory input
         ) public view returns (bool r) {
         Proof memory proof;
         proof.A = Pairing.G1Point(a[0], a[1]);

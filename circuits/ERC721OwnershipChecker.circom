@@ -1,38 +1,45 @@
 pragma circom 2.0.4;
 
 include "../circomlib/circuits/eddsamimc.circom";
+include "../circomlib/circuits/bitify.circom";
+include "../circomlib/circuits/mimc.circom";
 
 template ERC721OwnershipChecker() {
-  // Message checking
+  // Check if the original message ends with the token address
   signal input message[90];
   signal input tokenAddress[42];
   for (var i = 0; i < 42; i++) {
     message[48 + i] === tokenAddress[i];
   }
 
-  // EdDSA signature
-  signal input from_x;
-  signal input from_y;
+  // Check if the EdDSA signature is valid
+  signal input pubKeyX;
+  signal input pubKeyY;
   signal input R8x;
   signal input R8y;
   signal input S;
   signal input M;
   component verifier = EdDSAMiMCVerifier();
   verifier.enabled <== 1;
-  verifier.Ax <== from_x;
-  verifier.Ay <== from_y;
+  verifier.Ax <== pubKeyX;
+  verifier.Ay <== pubKeyY;
   verifier.R8x <== R8x;
   verifier.R8y <== R8y;
   verifier.S <== S;
   verifier.M <== M;
 
-  // Message hash checking
-  // TODO: check that mimc7(message) is the same as M
+  // Check if the EdDSA message is mimc7(originalMessage)
+  // signal input originalHashedMessage;
+  // component bits2num = Bits2Num(90);
+  // signal originalMessageNumber;
+  // for (var i = 0; i < 90; i++) {
+  //   bits2num.in[i] <== message[i];
+  // }
+  // originalMessageNumber <== bits2num.out;
+  // log(originalMessageNumber);
 
-  // Attestor address checking
-  // TODO: check that EdDSA signature was signed by the public key of the attestor
-  signal input attestorPublicKey;
-  log(attestorPublicKey);
+
+  // TODO: check that mimc7(message) is the same as M
 
   // Result
   // TODO: write the result into the result signal
@@ -44,4 +51,4 @@ template ERC721OwnershipChecker() {
   signal output c <== a * b;
 }
 
-component main{public [tokenAddress]} = ERC721OwnershipChecker();
+component main{public [tokenAddress, pubKeyX]} = ERC721OwnershipChecker();
