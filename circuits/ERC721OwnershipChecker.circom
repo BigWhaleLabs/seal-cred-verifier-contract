@@ -1,8 +1,8 @@
 pragma circom 2.0.4;
 
-include "../circomlib/circuits/eddsamimc.circom";
-include "../circomlib/circuits/bitify.circom";
-include "../circomlib/circuits/mimc.circom";
+include "../node_modules/circomlib/circuits/eddsamimc.circom";
+include "../node_modules/circomlib/circuits/bitify.circom";
+include "../node_modules/circomlib/circuits/mimc.circom";
 
 template ERC721OwnershipChecker() {
   // Check if the original message ends with the token address
