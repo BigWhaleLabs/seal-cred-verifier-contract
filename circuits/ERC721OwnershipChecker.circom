@@ -6,7 +6,7 @@ include "../circomlib/circuits/mimc.circom";
 
 template ERC721OwnershipChecker() {
   // Check if the original message ends with the token address
-  signal input message[90];
+  signal input message[97];
   signal input tokenAddress[42];
   for (var i = 0; i < 42; i++) {
     message[48 + i] === tokenAddress[i];
@@ -29,12 +29,19 @@ template ERC721OwnershipChecker() {
   verifier.M <== M;
 
   // Check if the EdDSA's "M" is "message" hashed
-  component mimc7 = MultiMiMC7(90, 91);
+  component mimc7 = MultiMiMC7(97, 91);
   mimc7.k <== 0;
-  for (var i = 0; i < 90; i++) {
+  for (var i = 0; i < 97; i++) {
     mimc7.in[i] <== message[i];
   }
   M === mimc7.out;
+
+  // Export the nullifier
+  component bits2Num = Bits2Num(6);
+  for (var i = 0; i < 6; i++) {
+    bits2Num.in[i] <== message[91 + i];
+  }
+  signal output nullifier <== bits2Num.out;
 }
 
 component main{public [tokenAddress, pubKeyX]} = ERC721OwnershipChecker();
