@@ -1,17 +1,11 @@
-name: Compile and lint
-
+name: Build and lint code
 on:
-  release:
-    types: [synchronize, created]
-
+  pull_request:
+    types: [synchronize, opened]
+env:
+  NODE_ENV: test
 jobs:
-  compile-code:
+  build-and-lint-code:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Install modules
-        run: yarn
-      - name: Compile code
-        run: yarn compile
-      - name: Lint code
-        run: yarn lint
+      - uses: Borodutch/build-and-lint-code@v1.0.3

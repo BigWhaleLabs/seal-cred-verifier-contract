@@ -11,10 +11,9 @@ Verifies a ZK proof of the following two claims:
 2. Install the dependencies with `yarn`
 3. Add environment variables to your `.env` file
 4. Create an empty folder named `build` at the top most level of the repo
-5. Run `yarn download-ptau` to download ptau for proving
-6. Run `yarn prove` to compile the circom circuits, create proof, verify proof, exports verifier as a solidity Verifier.sol
-7. Run `yarn compile` to compile the contract
-8. Run the scripts below for different commands
+5. Run `yarn compile-circuit` to compile the circom circuits, create proof, verify proof, exports verifier as a solidity Verifier.sol
+6. Run `yarn compile` to compile the contract
+7. Run the scripts below
 
 ## Environment variables
 
@@ -28,12 +27,11 @@ Also check out the `.env.example` file for more information.
 
 ## Available scripts
 
-- `yarn compile` — compiles the contract ts interface to the `typechain` directory
+- `yarn build` — compiles the contract ts interface to the `typechain` directory
+- `yarn compile-circuit` - compiles the circom circuits, creates proof, verifies proof, exports verifier as a solidity Verifier.sol
 - `yarn test` — runs the test suite
 - `yarn deploy` — deploys the contract to the network
 - `yarn eth-lint` — runs the linter for the solidity contract
 - `yarn lint` — runs all the linters
 - `yarn prettify` — prettifies the code in th project
 - `yarn release` — relases the `typechain` directory to NPM
-- `yarn prove` - compiles the circom circuits, creates proof, verifies proof, exports verifier as a solidity Verifier.sol
-- `yarn download-ptau` - downloads the required pot24_final.ptau

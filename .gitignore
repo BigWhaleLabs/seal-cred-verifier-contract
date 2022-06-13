@@ -4,7 +4,8 @@ coverage
 coverage.json
 typechain
 .DS_Store
-dist
+build/*
+!build/.gitkeep
 
 # Hardhat files
 cache
@@ -15,8 +16,8 @@ artifacts
 
 # PoT files
 pot/pot24_final.ptau
-pot/OwnershipChecker_0000.zkey
-pot/OwnershipChecker_final.zkey
+pot/ERC721OwnershipChecker_0000.zkey
+pot/ERC721OwnershipChecker_final.zkey
 
 # yarn
 .pnp.*
