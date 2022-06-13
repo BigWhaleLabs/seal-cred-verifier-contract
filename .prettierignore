@@ -6,3 +6,5 @@ gasReporterOutput.json
 typechain
 .yarn
 dist
+build
+pot
