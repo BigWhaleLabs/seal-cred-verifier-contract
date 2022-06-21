@@ -13,7 +13,7 @@ template EmailOwnershipChecker() {
   signal input message[messageLength];
   signal input domain[domainLength];
   for (var i = 0; i < domainLength; i++) {
-    message[nullifierLength + i] === domain[i];
+    message[i] === domain[i];
   }
 
   // Check if the EdDSA signature is valid
@@ -43,7 +43,7 @@ template EmailOwnershipChecker() {
   // Export the nullifier
   component bits2Num = Bits2Num(nullifierLength);
   for (var i = 0; i < nullifierLength; i++) {
-    bits2Num.in[i] <== message[i];
+    bits2Num.in[i] <== message[domainLength + i];
   }
   signal output nullifier <== bits2Num.out;
 }
