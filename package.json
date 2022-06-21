@@ -28,7 +28,8 @@
     "prettify": "prettier --write .",
     "release": "np",
     "prepublishOnly": "yarn build && yarn tsc",
-    "compile-circuit": "scripts/compile-circuit.sh"
+    "compile-erc721": "scripts/compile-circuit.sh ERC721OwnershipChecker input-erc721",
+    "compile-email": "scripts/compile-circuit.sh EmailOwnershipChecker input-email"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
