@@ -41,4 +41,7 @@ starEcho "VERIFYING PROOF FOR SAMPLE INPUT"
 yarn snarkjs groth16 verify "pot/$1_verification_key.json" build/public.json build/proof.json
 
 # Export the verifier as a smart contract
-yarn snarkjs zkey export solidityverifier "pot/$1_final.zkey" contracts/Verifier.sol
+yarn snarkjs zkey export solidityverifier "pot/$1_final.zkey" "contracts/$1Verifier.sol"
+
+# Change Solidity compiler version
+sed -i '' 's/0.6.11;/0.8.14;/' "contracts/$1Verifier.sol"
