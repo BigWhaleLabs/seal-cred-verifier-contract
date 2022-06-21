@@ -3,16 +3,17 @@ pragma circom 2.0.4;
 include "../node_modules/circomlib/circuits/eddsamimc.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 include "../node_modules/circomlib/circuits/mimc.circom";
+include "../node_modules/circomlib/circuits/comparators.circom";
 
 template EmailOwnershipChecker() {
+  var domainLength = 90;
+  var nullifierLength = 14;
+  var messageLength = nullifierLength + domainLength;
   // Check if the original message contains the email domain
-  signal input message[335];
-  signal input domain[255];
-  signal input domainIndex;
-  for (var i = 0; i < 255; i++) {
-    if (domain[i] != 0) {
-      message[domainIndex + i] === domain[i];
-    }
+  signal input message[messageLength];
+  signal input domain[domainLength];
+  for (var i = 0; i < domainLength; i++) {
+    message[nullifierLength + i] === domain[i];
   }
 
   // Check if the EdDSA signature is valid
@@ -32,16 +33,16 @@ template EmailOwnershipChecker() {
   verifier.M <== M;
 
   // Check if the EdDSA's "M" is "message" hashed
-  component mimc7 = MultiMiMC7(335, 91);
+  component mimc7 = MultiMiMC7(messageLength, 91);
   mimc7.k <== 0;
-  for (var i = 0; i < 335; i++) {
+  for (var i = 0; i < messageLength; i++) {
     mimc7.in[i] <== message[i];
   }
   M === mimc7.out;
 
   // Export the nullifier
-  component bits2Num = Bits2Num(14);
-  for (var i = 0; i < 14; i++) {
+  component bits2Num = Bits2Num(nullifierLength);
+  for (var i = 0; i < nullifierLength; i++) {
     bits2Num.in[i] <== message[i];
   }
   signal output nullifier <== bits2Num.out;
