@@ -45,3 +45,4 @@ yarn snarkjs zkey export solidityverifier "pot/$1_final.zkey" "contracts/$1Verif
 
 # Change Solidity compiler version
 sed -i '' 's/0.6.11;/0.8.14;/' "contracts/$1Verifier.sol"
+sed -i '' "s/contract Verifier/contract $1Verifier/" "contracts/$1Verifier.sol"

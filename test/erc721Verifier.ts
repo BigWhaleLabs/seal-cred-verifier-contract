@@ -77,9 +77,11 @@ const invalidProof = {
   input: validProof.input,
 }
 
-describe('Verifier contract', function () {
+describe('ERC721OwnershipCheckerVerifier contract', function () {
   before(async function () {
-    const factory = await ethers.getContractFactory('Verifier')
+    const factory = await ethers.getContractFactory(
+      'ERC721OwnershipCheckerVerifier'
+    )
     this.contract = await factory.deploy()
 
     await this.contract.deployed()
