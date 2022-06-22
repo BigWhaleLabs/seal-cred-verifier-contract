@@ -43,6 +43,11 @@ yarn snarkjs groth16 verify "pot/$1_verification_key.json" build/public.json bui
 # Export the verifier as a smart contract
 yarn snarkjs zkey export solidityverifier "pot/$1_final.zkey" "contracts/$1Verifier.sol"
 
-# Change Solidity compiler version
+# Change Solidity compiler version and contract name
 sed -i '' 's/0.6.11;/0.8.14;/' "contracts/$1Verifier.sol"
 sed -i '' "s/contract Verifier/contract $1Verifier/" "contracts/$1Verifier.sol"
+
+# Copy all the required files to the public directory
+cp "pot/$1_final.zkey" "public/$1_final.zkey"
+cp "pot/$1_verification_key.json" "public/$1_verification_key.json"
+cp "build/$1_js/$1.wasm" "public/$1.wasm"
