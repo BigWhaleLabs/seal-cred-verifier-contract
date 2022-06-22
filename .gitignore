@@ -15,9 +15,8 @@ artifacts
 *.log
 
 # PoT files
-pot/pot24_final.ptau
 pot/ERC721OwnershipChecker_0000.zkey
-pot/ERC721OwnershipChecker_final.zkey
+pot/EmailOwnershipChecker_0000.zkey
 
 # yarn
 .pnp.*
