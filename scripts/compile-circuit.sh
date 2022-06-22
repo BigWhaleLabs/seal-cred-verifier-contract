@@ -12,7 +12,7 @@ circom "circuits/$1.circom" --r1cs --wasm --sym --c -o build
 
 # Generate witness
 starEcho "GENERATING WITNESS FOR SAMPLE INPUT"
-node "build/$1_js/generate_witness.js" "build/$1_js/$1.wasm" "inputs/$2.json" build/witness.wtns
+node "build/$1_js/generate_witness.js" "build/$1_js/$1.wasm" "inputs/input-$2.json" "build/witness-$2.wtns"
 
 # Generate zkey 0000
 starEcho "GENERATING ZKEY 0000"
@@ -33,12 +33,12 @@ yarn snarkjs zkey export verificationkey "pot/$1_final.zkey" "pot/$1_verificatio
 
 # Create the proof
 starEcho "CREATING PROOF FOR SAMPLE INPUT"
-yarn snarkjs groth16 prove "pot/$1_final.zkey" build/witness.wtns \
-  build/proof.json build/public.json
+yarn snarkjs groth16 prove "pot/$1_final.zkey" "build/witness-$2.wtns" \
+  "build/proof-$2.json" "build/public-$2.json"
 
 # Verify the proof
 starEcho "VERIFYING PROOF FOR SAMPLE INPUT"
-yarn snarkjs groth16 verify "pot/$1_verification_key.json" build/public.json build/proof.json
+yarn snarkjs groth16 verify "pot/$1_verification_key.json" "build/public-$2.json" "build/proof-$2.json"
 
 # Export the verifier as a smart contract
 yarn snarkjs zkey export solidityverifier "pot/$1_final.zkey" "contracts/$1Verifier.sol"
