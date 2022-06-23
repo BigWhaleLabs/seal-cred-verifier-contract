@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import { wasm as wasmTester } from 'circom_tester'
+import { utils } from 'ethers'
 
 const expectedError = (err) => err.message.includes('Assert Failed')
 
@@ -35,6 +36,10 @@ describe('ERC721OwnershipChecker circuit', function () {
   it('should generate the witness successfully', async function () {
     const witness = await this.circuit.calculateWitness(input)
     await this.circuit.assertOut(witness, {})
+    // Check the nullifier
+    const nullifier = witness.slice(1, 1 + 14).map((d) => Number(d))
+    const nullifierFromInput = input.message.slice(-14)
+    assert.equal(utils.hexlify(nullifier), utils.hexlify(nullifierFromInput))
   })
   it('should fail because the message is invalid', async function () {
     const invalidInput = {

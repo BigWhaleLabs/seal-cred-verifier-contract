@@ -1,17 +1,21 @@
 pragma circom 2.0.4;
 
 include "../node_modules/circomlib/circuits/eddsamimc.circom";
-include "../node_modules/circomlib/circuits/bitify.circom";
 include "../node_modules/circomlib/circuits/mimc.circom";
 
 template ERC721OwnershipChecker() {
+  var nullifierLength = 14;
+  var addressLength = 42;
+  var ownsWordLength = 4;
+  var dashLength = 1;
   // Check if the original message ends with the token address
-  signal input message[105];
-  signal input tokenAddress[42];
-  for (var i = 0; i < 42; i++) {
-    message[48 + i] === tokenAddress[i];
+  var messageLength = addressLength + dashLength + ownsWordLength + dashLength + addressLength + dashLength + nullifierLength;
+  signal input message[messageLength];
+  signal input tokenAddress[addressLength];
+  var tokenAddressIndex = addressLength + dashLength + ownsWordLength + dashLength;
+  for (var i = 0; i < addressLength; i++) {
+    message[tokenAddressIndex + i] === tokenAddress[i];
   }
-
   // Check if the EdDSA signature is valid
   signal input pubKeyX;
   signal input pubKeyY;
@@ -27,21 +31,19 @@ template ERC721OwnershipChecker() {
   verifier.R8y <== R8y;
   verifier.S <== S;
   verifier.M <== M;
-
   // Check if the EdDSA's "M" is "message" hashed
-  component mimc7 = MultiMiMC7(105, 91);
+  component mimc7 = MultiMiMC7(messageLength, 91);
   mimc7.k <== 0;
-  for (var i = 0; i < 105; i++) {
+  for (var i = 0; i < messageLength; i++) {
     mimc7.in[i] <== message[i];
   }
   M === mimc7.out;
-
   // Export the nullifier
-  component bits2Num = Bits2Num(14);
-  for (var i = 0; i < 14; i++) {
-    bits2Num.in[i] <== message[91 + i];
+  signal output nullifier[nullifierLength];
+  var nullifierIndex = addressLength + dashLength + ownsWordLength + dashLength + addressLength + dashLength;
+  for (var i = 0; i < nullifierLength; i++) {
+    nullifier[i] <== message[nullifierIndex + i];
   }
-  signal output nullifier <== bits2Num.out;
 }
 
 component main{public [tokenAddress, pubKeyX]} = ERC721OwnershipChecker();
