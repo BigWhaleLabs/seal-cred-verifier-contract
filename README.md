@@ -2,8 +2,8 @@
 
 Verifies a ZK proof of the following two claims:
 
-1. Prover owns an Ethereum address (the signature is valid)
-2. This Ethereum address is a part of the given Merkle tree
+1. User owns an attestation that they own an ERC721 token
+2. User owns an attestation that they own an email ending in the specified domain name
 
 ## Usage
 
