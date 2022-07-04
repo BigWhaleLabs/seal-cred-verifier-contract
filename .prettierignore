@@ -8,3 +8,6 @@ typechain
 dist
 build
 pot
+public
+*Verifier.sol
+Verifier.ts
