@@ -3,11 +3,11 @@ pragma circom 2.0.4;
 include "../node_modules/circomlib/circuits/eddsamimc.circom";
 include "../node_modules/circomlib/circuits/mimc.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
+include "./Nullify.circom";
 
 template EmailOwnershipChecker() {
   var domainLength = 90;
-  var nullifierLength = 14;
-  var messageLength = domainLength + nullifierLength;
+  var messageLength = 90;
   // Check if the original message contains the email domain
   signal input message[messageLength];
   signal input domain[domainLength];
@@ -40,10 +40,16 @@ template EmailOwnershipChecker() {
   M === mimc7.out;
 
   // Export the nullifier
-  signal output nullifier[nullifierLength];
-  for (var i = 0; i < nullifierLength; i++) {
-    nullifier[i] <== message[domainLength + i];
+  var sigLength = 3;
+  signal input r[sigLength];
+  signal input s[sigLength];
+  signal input nullifierHash;
+  component nullifier = Nullify(sigLength);
+  for (var i = 0; i < sigLength; i++) {
+    nullifier.r[i] <== r[i];
+    nullifier.s[i] <== s[i];
   }
+  nullifierHash === nullifier.nullifierHash;
 }
 
 component main{public [domain, pubKeyX]} = EmailOwnershipChecker();

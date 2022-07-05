@@ -199,7 +199,7 @@ contract ERC721OwnershipCheckerVerifier {
             [11502426145685875357967720478366491326865907869902181704031346886834786027007,
              21679208693936337484429571887537508926366191105267550375038502782696042114705]
         );
-        vk.IC = new Pairing.G1Point[](45);
+        vk.IC = new Pairing.G1Point[](44);
         
         vk.IC[0] = Pairing.G1Point( 
             15393866901492630444712668330929353676562521649242164403493062096429580651019,
@@ -421,11 +421,6 @@ contract ERC721OwnershipCheckerVerifier {
             21270330692166587786007808604748911020336703276178017892942111360596680845434
         );                                      
         
-        vk.IC[44] = Pairing.G1Point( 
-            14875587817655973349749675495375317389320248035837079726967356319729738005852,
-            1949235038012899629101322438059922214366697601490027621181384636092827207277
-        );                                      
-        
     }
     function verify(uint[] memory input, Proof memory proof) internal view returns (uint) {
         uint256 snark_scalar_field = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
@@ -451,7 +446,7 @@ contract ERC721OwnershipCheckerVerifier {
             uint[2] memory a,
             uint[2][2] memory b,
             uint[2] memory c,
-            uint[44] memory input
+            uint[43] memory input
         ) public view returns (bool r) {
         Proof memory proof;
         proof.A = Pairing.G1Point(a[0], a[1]);
