@@ -44,13 +44,13 @@ template ERC721OwnershipChecker() {
   var sigLength = 3;
   signal input r[sigLength];
   signal input s[sigLength];
-  signal input nullifierHash;
+  signal input nonce;
   component nullifier = Nullify(sigLength);
   for (var i = 0; i < sigLength; i++) {
     nullifier.r[i] <== r[i];
     nullifier.s[i] <== s[i];
   }
-  nullifierHash === nullifier.nullifierHash;
+  signal output nullifierHash <== nullifier.nullifierHash;
 }
 
 component main{public [tokenAddress, pubKeyX]} = ERC721OwnershipChecker();
