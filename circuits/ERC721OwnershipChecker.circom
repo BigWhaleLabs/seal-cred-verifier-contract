@@ -4,7 +4,7 @@ include "../node_modules/circomlib/circuits/eddsamimc.circom";
 include "../node_modules/circomlib/circuits/mimc.circom";
 include "./Nullify.circom";
 
-template ERC721OwnershipChecker(k) {
+template ERC721OwnershipChecker() {
   var addressLength = 42;
   var ownsWordLength = 4;
   var dashLength = 1;
@@ -12,6 +12,7 @@ template ERC721OwnershipChecker(k) {
   var messageLength = addressLength + dashLength + ownsWordLength + dashLength + addressLength;
   signal input message[messageLength];
   signal input tokenAddress[addressLength];
+
   var tokenAddressIndex = addressLength + dashLength + ownsWordLength + dashLength;
   for (var i = 0; i < addressLength; i++) {
     message[tokenAddressIndex + i] === tokenAddress[i];
@@ -23,9 +24,6 @@ template ERC721OwnershipChecker(k) {
   signal input R8y;
   signal input S;
   signal input M;
-  signal input r[k];
-  signal input s[k];
-  signal input nullifierHash;
 
   component verifier = EdDSAMiMCVerifier();
   verifier.enabled <== 1;
@@ -42,13 +40,17 @@ template ERC721OwnershipChecker(k) {
     mimc7.in[i] <== message[i];
   }
   M === mimc7.out;
-  
-  component nullifier = Nullify(k);
-  for (var i = 0;i < k;i++) {
+  // Create nullifier
+  var sigLength = 3;
+  signal input r[sigLength];
+  signal input s[sigLength];
+  signal input nullifierHash;
+  component nullifier = Nullify(sigLength);
+  for (var i = 0; i < sigLength; i++) {
     nullifier.r[i] <== r[i];
     nullifier.s[i] <== s[i];
   }
   nullifierHash === nullifier.nullifierHash;
 }
 
-component main{public [tokenAddress, pubKeyX]} = ERC721OwnershipChecker(3);
+component main{public [tokenAddress, pubKeyX]} = ERC721OwnershipChecker();
