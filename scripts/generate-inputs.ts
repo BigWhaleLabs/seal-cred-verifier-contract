@@ -5,7 +5,9 @@ import * as ed from '@noble/ed25519'
 import { resolve } from 'path'
 import { cwd } from 'process'
 
-const privateKeyBytes = ed.utils.randomPrivateKey()
+const privateKeyBytes = utils.arrayify(
+  '0xfe9e8f75954709b4ca5ecd83e31da941ca97a9b518b846c9e1eceafedea363cf'
+) // ed.utils.randomPrivateKey()
 
 async function eddsaSign(message: Uint8Array) {
   const eddsa = await buildEddsa()
