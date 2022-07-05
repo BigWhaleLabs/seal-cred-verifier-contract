@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import { wasm as wasmTester } from 'circom_tester'
-import { utils } from 'ethers'
+// import { utils } from 'ethers'
 
 const expectedError = (err) => err.message.includes('Assert Failed')
 
