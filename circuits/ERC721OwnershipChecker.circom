@@ -41,14 +41,14 @@ template ERC721OwnershipChecker() {
   M === mimc7.out;
   // Create nullifier
   var sigLength = 3;
-  signal input r[sigLength];
-  signal input s[sigLength];
+  signal input r2;
+  signal input s2;
   signal input nonce;
-  component nullifier = Nullify(sigLength);
-  for (var i = 0; i < sigLength; i++) {
-    nullifier.r[i] <== r[i];
-    nullifier.s[i] <== s[i];
-  }
+  
+  component nullifier = Nullify();
+  nullifier.r <== r2;
+  nullifier.s <== s2;
+  nullifier.nonce <== nonce;
   signal output nullifierHash <== nullifier.nullifierHash;
 }
 

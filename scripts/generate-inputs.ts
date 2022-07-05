@@ -1,13 +1,17 @@
 import { buildBabyjub, buildEddsa, buildMimc7 } from 'circomlibjs'
-import { BigNumber, utils } from 'ethers'
+import { BigNumber, utils, Wallet } from 'ethers'
 import { writeFileSync } from 'fs'
 import * as ed from '@noble/ed25519'
 import { resolve } from 'path'
 import { cwd } from 'process'
+import { Entropy, charset16 } from 'entropy-string'
+
+const entropy = new Entropy({ total: 1e6, risk: 1e9, charset: charset16 })
 
 const privateKeyBytes = utils.arrayify(
   '0xfe9e8f75954709b4ca5ecd83e31da941ca97a9b518b846c9e1eceafedea363cf'
 ) // ed.utils.randomPrivateKey()
+const randomWallet = Wallet.createRandom()
 
 async function eddsaSign(message: Uint8Array) {
   const eddsa = await buildEddsa()
@@ -18,6 +22,12 @@ async function eddsaSign(message: Uint8Array) {
     publicKey,
     signature,
   }
+}
+
+async function getSignatureInputs(message = 'For SealCred') {
+  const signature = await randomWallet.signMessage(message)
+  const { r: r2, s: s2 } = utils.splitSignature(signature)
+  return { r2, s2, nonce: `0x${entropy.string()}` }
 }
 
 async function generateERC721Input() {
@@ -42,6 +52,7 @@ async function generateERC721Input() {
     R8y: F.toObject(signature.R8[1]).toString(),
     S: signature.S.toString(),
     M: F.toObject(M).toString(),
+    ...(await getSignatureInputs()),
   }
   // Writing inputs
   writeFileSync(
@@ -81,6 +92,7 @@ async function generateEmailInput() {
     R8y: F.toObject(signature.R8[1]).toString(),
     S: signature.S.toString(),
     M: F.toObject(M).toString(),
+    ...(await getSignatureInputs()),
   }
   // Writing inputs
   writeFileSync(
