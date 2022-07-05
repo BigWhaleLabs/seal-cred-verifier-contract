@@ -29,7 +29,8 @@
     "release": "np",
     "prepublishOnly": "yarn build && yarn tsc",
     "compile-erc721": "scripts/compile-circuit.sh ERC721OwnershipChecker erc721",
-    "compile-email": "scripts/compile-circuit.sh EmailOwnershipChecker email"
+    "compile-email": "scripts/compile-circuit.sh EmailOwnershipChecker email",
+    "generate-inputs": "ts-node scripts/generate-inputs.ts"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
@@ -63,15 +64,18 @@
     "prettier-plugin-solidity": "^1.0.0-beta.19",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.7.21",
-    "ts-node": "^10.8.1",
+    "ts-node": "^10.8.2",
     "typechain": "^8.1.0",
     "typescript": "^4.7.4"
   },
   "packageManager": "yarn@3.2.0",
   "dependencies": {
     "@big-whale-labs/constants": "^0.0.18",
+    "@noble/ed25519": "^1.6.1",
     "circom_tester": "^0.0.14",
     "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.6",
+    "entropy-string": "^4.2.0",
     "prompt-sync": "^4.2.0",
     "snarkjs": "^0.4.22"
   },

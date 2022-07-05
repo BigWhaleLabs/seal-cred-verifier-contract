@@ -7,13 +7,12 @@ include "./Nullify.circom";
 template ERC721OwnershipChecker() {
   var addressLength = 42;
   var ownsWordLength = 4;
-  var dashLength = 1;
   // Check if the original message ends with the token address
-  var messageLength = addressLength + dashLength + ownsWordLength + dashLength + addressLength;
+  var messageLength = addressLength + ownsWordLength + addressLength;
   signal input message[messageLength];
   signal input tokenAddress[addressLength];
 
-  var tokenAddressIndex = addressLength + dashLength + ownsWordLength + dashLength;
+  var tokenAddressIndex = addressLength + ownsWordLength;
   for (var i = 0; i < addressLength; i++) {
     message[tokenAddressIndex + i] === tokenAddress[i];
   }
