@@ -1,10 +1,10 @@
 import { assert } from 'chai'
 import { wasm as wasmTester } from 'circom_tester'
-import { utils } from 'ethers'
+import { BigNumber, utils } from 'ethers'
 import { buildMimcSponge } from 'circomlibjs'
 import getBalanceInputs from '../utils/getBalanceInputs'
 import padZerosOnLeftHexString from '../utils/padZerosOnLeftHexString'
-import { zero } from '../utils/constants'
+import { maxUInt256, zero } from '../utils/constants'
 import expectAssertFailure from '../utils/expectAssertFailure'
 
 describe('BalanceChecker circuit', function () {
@@ -25,35 +25,43 @@ describe('BalanceChecker circuit', function () {
       utils.hexlify(witness[44])
     )
   })
-  const inputsAndResults = [
-    {
-      inputs: [zero, '0x1'],
-      result: 'failure',
-    },
-    {
-      inputs: ['0x6b87c4e204970e6', '0x1'],
-      result: 'success',
-    },
-    {
-      inputs: ['0x1', zero],
-      result: 'success',
-    },
-  ] as {
-    inputs: string[]
-    result: 'success' | 'failure'
-  }[]
-  for (const {
-    inputs: [balance, threshold],
-    result,
-  } of inputsAndResults) {
-    it(`should return ${result} for balance ${balance} and threshold ${threshold}`, async function () {
-      const inputs = await getBalanceInputs(balance, threshold)
-      if (result === 'success') {
-        const witness = await this.circuit.calculateWitness(inputs)
-        await this.circuit.assertOut(witness, {})
+  // Generate and test possible edge cases
+  const testValues = [zero, '0x1', '0x6b87c4e204970e6', maxUInt256].map((v) =>
+    BigNumber.from(v)
+  )
+  const resultsToInputs = {
+    success: [],
+    failure: [],
+  } as {
+    success: string[][]
+    failure: string[][]
+  }
+  for (const balance of testValues) {
+    for (const threshold of testValues) {
+      if (balance.gte(threshold)) {
+        resultsToInputs.success.push([
+          balance.toHexString(),
+          threshold.toHexString(),
+        ])
       } else {
-        await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+        resultsToInputs.failure.push([
+          balance.toHexString(),
+          threshold.toHexString(),
+        ])
       }
+    }
+  }
+  for (const [balance, threshold] of resultsToInputs.success) {
+    it(`should succeed for balance ${balance} and threshold ${threshold}`, async function () {
+      const inputs = await getBalanceInputs(balance, threshold)
+      const witness = await this.circuit.calculateWitness(inputs)
+      await this.circuit.assertOut(witness, {})
+    })
+  }
+  for (const [balance, threshold] of resultsToInputs.failure) {
+    it(`should fail for balance ${balance} and threshold ${threshold}`, async function () {
+      const inputs = await getBalanceInputs(balance, threshold)
+      await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
     })
   }
   it('should fail because the message is invalid', async function () {
