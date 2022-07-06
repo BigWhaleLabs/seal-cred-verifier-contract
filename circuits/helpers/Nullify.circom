@@ -1,6 +1,6 @@
 pragma circom 2.0.4;
 
-include "../node_modules/circomlib/circuits/mimcsponge.circom";
+include "../../node_modules/circomlib/circuits/mimcsponge.circom";
 
 template Nullify() {
     signal input r;
