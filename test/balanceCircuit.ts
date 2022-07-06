@@ -13,7 +13,7 @@ describe('BalanceChecker circuit', function () {
     this.baseInputs = await getBalanceInputs()
   })
 
-  it('should generate the witness successfully and return the correct nullifier', async function () {
+  it.only('should generate the witness successfully and return the correct nullifier', async function () {
     const inputs = await getBalanceInputs()
     const witness = await this.circuit.calculateWitness(inputs)
     await this.circuit.assertOut(witness, {})

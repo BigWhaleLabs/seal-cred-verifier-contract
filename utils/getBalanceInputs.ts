@@ -5,6 +5,7 @@ import getSignatureInputs from './getSignatureInputs'
 
 async function inputsForMessage(
   message: string,
+  suffix: string,
   balance?: string,
   threshold?: string
 ) {
@@ -16,15 +17,15 @@ async function inputsForMessage(
   const M = mimc7.multiHash(messageBytes)
   const { publicKey, signature } = await eddsaSign(M)
   return {
-    message: Array.from(messageUInt8),
+    [`message${suffix}`]: Array.from(messageUInt8),
+    [`pubKeyX${suffix}`]: F.toObject(publicKey[0]).toString(),
+    [`pubKeyY${suffix}`]: F.toObject(publicKey[1]).toString(),
+    [`R8x${suffix}`]: F.toObject(signature.R8[0]).toString(),
+    [`R8y${suffix}`]: F.toObject(signature.R8[1]).toString(),
+    [`S${suffix}`]: signature.S.toString(),
+    [`M${suffix}`]: F.toObject(M).toString(),
     balance,
     threshold,
-    pubKeyX: F.toObject(publicKey[0]).toString(),
-    pubKeyY: F.toObject(publicKey[1]).toString(),
-    R8x: F.toObject(signature.R8[0]).toString(),
-    R8y: F.toObject(signature.R8[1]).toString(),
-    S: signature.S.toString(),
-    M: F.toObject(M).toString(),
   }
 }
 
@@ -34,9 +35,14 @@ export default async function (
   ownerAddress = '0xbf74483DB914192bb0a9577f3d8Fb29a6d4c08eE',
   tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6'
 ) {
-  const message = `${ownerAddress}owns${tokenAddress}g`
   return {
-    ...(await inputsForMessage(message, balance, threshold)),
+    ...(await inputsForMessage(
+      `${ownerAddress}owns${tokenAddress}g`,
+      'Token',
+      balance,
+      threshold
+    )),
+    ...(await inputsForMessage(ownerAddress, 'Address', balance, threshold)),
     ...(await getSignatureInputs()),
   }
 }
