@@ -106,12 +106,11 @@ async function generateEmailInput() {
 async function generateEthereumBalanceInput() {
   // Message
   const ownerAddress = '0xbf74483DB914192bb0a9577f3d8Fb29a6d4c08eE'
-  const balance =
-    '0x00000000000000000000000000000000000000000000000006b87c4e204970e6'
-  const message = `${ownerAddress}g${balance}`
+  const balance = '0x6b87c4e204970e6'
+  const message = `${ownerAddress}g`
   const messageUInt8 = utils.toUtf8Bytes(message)
   const mimc7 = await buildMimc7()
-  const M = mimc7.multiHash(messageUInt8)
+  const M = mimc7.multiHash([...messageUInt8, balance])
   // EdDSA
   const { publicKey, signature } = await eddsaSign(M)
   // Generating inputs
@@ -119,12 +118,14 @@ async function generateEthereumBalanceInput() {
   const F = babyJub.F
   const inputs = {
     message: Array.from(messageUInt8),
+    balance,
     pubKeyX: F.toObject(publicKey[0]).toString(),
     pubKeyY: F.toObject(publicKey[1]).toString(),
     R8x: F.toObject(signature.R8[0]).toString(),
     R8y: F.toObject(signature.R8[1]).toString(),
     S: signature.S.toString(),
     M: F.toObject(M).toString(),
+    threshold: '0x0',
     ...(await getSignatureInputs()),
   }
   // Writing inputs

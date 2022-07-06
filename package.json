@@ -30,6 +30,7 @@
     "prepublishOnly": "yarn build && yarn tsc",
     "compile-erc721": "scripts/compile-circuit.sh ERC721OwnershipChecker erc721",
     "compile-email": "scripts/compile-circuit.sh EmailOwnershipChecker email",
+    "compile-ethereum-balance": "scripts/compile-circuit.sh EthereumBalanceChecker ethereum-balance",
     "generate-inputs": "ts-node scripts/generate-inputs.ts"
   },
   "devDependencies": {
