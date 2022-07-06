@@ -46,7 +46,7 @@ describe('ERC721OwnershipChecker circuit', function () {
       '0x0fd319eaa426462ed17e3d8c860ccbc50909522612fc89f92867f1dd0395a277',
       '0x084e43d58fdf54f036',
     ])
-    assert.equal(utils.hexlify(hash), utils.hexlify(witness[1]))
+    assert.equal(`0x${mimc.F.toString(hash, 16)}`, utils.hexlify(witness[1]))
   })
   it('should fail because the message is invalid', async function () {
     const invalidInput = {
