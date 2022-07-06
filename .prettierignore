@@ -9,6 +9,8 @@ dist
 build
 pot
 contracts
-Verifier.ts
 input-*.json
 *verification_key.json
+public
+*Verifier.sol
+Verifier.ts

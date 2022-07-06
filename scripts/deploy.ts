@@ -46,7 +46,10 @@ async function main() {
       address,
     })
   } catch (err) {
-    console.log('Error verifiying contract on Etherscan:', err)
+    console.log(
+      'Error verifiying contract on Etherscan:',
+      err instanceof Error ? err.message : err
+    )
   }
   // Print out the information
   console.log(`${verifierContractName} deployed and verified on Etherscan!`)
