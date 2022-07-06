@@ -8,6 +8,9 @@ typechain
 dist
 build
 pot
+contracts
+input-*.json
+*verification_key.json
 public
 *Verifier.sol
 Verifier.ts
