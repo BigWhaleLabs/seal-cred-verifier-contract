@@ -4,15 +4,13 @@ import { utils } from 'ethers'
 import { buildMimcSponge } from 'circomlibjs'
 
 const expectedError = (err) => err.message.includes('Assert Failed')
+function padZeroesOnLeftHexString(hexString: string, length: number) {
+  const padding = '0'.repeat(length - hexString.length)
+  return `0x${padding}${hexString.substring(2)}`
+}
 
 const input = {
   message: [
-    98, 105, 103, 119, 104, 97, 108, 101, 108, 97, 98, 115, 46, 99, 111, 109, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  ],
-  domain: [
     98, 105, 103, 119, 104, 97, 108, 101, 108, 97, 98, 115, 46, 99, 111, 109, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -26,9 +24,9 @@ const input = {
   R8y: '10740611045853572746142064534257693773300226817620379210695421925811006659780',
   S: '1951774407546037671953995624213462928595262386347037775045967177714957872170',
   M: '16326699391730603227158046697851865060679964588080600882713030572574027071981',
-  r2: '0xa9f81085e77cf714d223e0d6be04dbc06713325a198304447d70c124e73808c5',
-  s2: '0x0fd319eaa426462ed17e3d8c860ccbc50909522612fc89f92867f1dd0395a277',
-  nonce: '0xe9faa571fbc4a5f380',
+  r2: '0x4c5a57590544b7fca1f042da3a96b79e66adbaec407b3b7b015db3c30f9837c2',
+  s2: '0x3b355fbd053553b4f9bcbc6b002d694c2ffc8524fc471c56469cc33a497f87af',
+  nonce: '0x2f61098bba9fc34541',
 }
 
 describe('EmailOwnershipChecker circuit', function () {
@@ -42,35 +40,21 @@ describe('EmailOwnershipChecker circuit', function () {
     // Check the nullifier
     const mimc = await buildMimcSponge()
     const hash = mimc.multiHash([
-      '0xa9f81085e77cf714d223e0d6be04dbc06713325a198304447d70c124e73808c5',
-      '0x0fd319eaa426462ed17e3d8c860ccbc50909522612fc89f92867f1dd0395a277',
-      '0xe9faa571fbc4a5f380',
+      '0x4c5a57590544b7fca1f042da3a96b79e66adbaec407b3b7b015db3c30f9837c2',
+      '0x3b355fbd053553b4f9bcbc6b002d694c2ffc8524fc471c56469cc33a497f87af',
+      '0x2f61098bba9fc34541',
     ])
-    assert.equal(`0x${mimc.F.toString(hash, 16)}`, utils.hexlify(witness[1]))
+    assert.equal(
+      padZeroesOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
+      utils.hexlify(witness[91])
+    )
   })
   it('should fail because the message is invalid', async function () {
     const invalidInput = {
       ...input,
       message: [
         98, 105, 103, 119, 104, 97, 108, 101, 108, 97, 98, 115, 46, 99, 111,
-        111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0,
-      ],
-    }
-    try {
-      await this.circuit.calculateWitness(invalidInput)
-    } catch (err) {
-      assert(expectedError(err))
-    }
-  })
-  it('should fail because the domain is invalid', async function () {
-    const invalidInput = {
-      ...input,
-      domain: [
-        98, 105, 103, 119, 104, 97, 108, 101, 108, 97, 98, 115, 46, 99, 111,
-        111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        109, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0,

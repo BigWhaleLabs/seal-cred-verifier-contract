@@ -8,12 +8,13 @@ include "./Nullify.circom";
 template EmailOwnershipChecker() {
   var domainLength = 90;
   var messageLength = 90;
-  // Check if the original message contains the email domain
+  // Get message
   signal input message[messageLength];
-  signal input domain[domainLength];
+  // Output domain
+  signal output domain[domainLength];
   
   for (var i = 0; i < domainLength; i++) {
-    message[i] === domain[i];
+    domain[i] <== message[i];
   }
   // Check if the EdDSA signature is valid
   signal input pubKeyX;
@@ -51,4 +52,4 @@ template EmailOwnershipChecker() {
   signal output nullifierHash <== nullifier.nullifierHash;
 }
 
-component main{public [domain, pubKeyX]} = EmailOwnershipChecker();
+component main{public [pubKeyX]} = EmailOwnershipChecker();

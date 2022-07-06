@@ -7,14 +7,15 @@ include "./Nullify.circom";
 template ERC721OwnershipChecker() {
   var addressLength = 42;
   var ownsWordLength = 4;
-  // Check if the original message ends with the token address
   var messageLength = addressLength + ownsWordLength + addressLength;
+  // Get message
   signal input message[messageLength];
-  signal input tokenAddress[addressLength];
-
+  // Export token address
   var tokenAddressIndex = addressLength + ownsWordLength;
+
+  signal output tokenAddress[addressLength];
   for (var i = 0; i < addressLength; i++) {
-    message[tokenAddressIndex + i] === tokenAddress[i];
+    tokenAddress[i] <== message[tokenAddressIndex + i];
   }
   // Check if the EdDSA signature is valid
   signal input pubKeyX;
@@ -52,4 +53,4 @@ template ERC721OwnershipChecker() {
   signal output nullifierHash <== nullifier.nullifierHash;
 }
 
-component main{public [tokenAddress, pubKeyX]} = ERC721OwnershipChecker();
+component main{public [pubKeyX]} = ERC721OwnershipChecker();

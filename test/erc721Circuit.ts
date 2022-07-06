@@ -4,6 +4,10 @@ import { utils } from 'ethers'
 import { buildMimcSponge } from 'circomlibjs'
 
 const expectedError = (err) => err.message.includes('Assert Failed')
+function padZeroesOnLeftHexString(hexString: string, length: number) {
+  const padding = '0'.repeat(length - hexString.length)
+  return `0x${padding}${hexString.substring(2)}`
+}
 
 const input = {
   message: [
@@ -13,11 +17,6 @@ const input = {
     54, 55, 54, 70, 52, 53, 55, 97, 70, 101, 49, 51, 101, 52, 55, 57, 101, 66,
     50, 97, 56, 65, 52, 68, 101, 56, 56, 66, 65, 49, 53, 66, 50, 99, 54,
   ],
-  tokenAddress: [
-    48, 120, 55, 50, 50, 66, 48, 54, 55, 54, 70, 52, 53, 55, 97, 70, 101, 49,
-    51, 101, 52, 55, 57, 101, 66, 50, 97, 56, 65, 52, 68, 101, 56, 56, 66, 65,
-    49, 53, 66, 50, 99, 54,
-  ],
   pubKeyX:
     '4877328357478890623967823018480272757589824716691017530689013849938564609461',
   pubKeyY:
@@ -26,9 +25,9 @@ const input = {
   R8y: '14544297482302945143394579046169367188060103096317511319064754936601293391615',
   S: '967609335072328902186680924470186055089271004235328405041128566363664325687',
   M: '2275624253458579094464483888730946672464378916143331426193859208720759311766',
-  r2: '0xa9f81085e77cf714d223e0d6be04dbc06713325a198304447d70c124e73808c5',
-  s2: '0x0fd319eaa426462ed17e3d8c860ccbc50909522612fc89f92867f1dd0395a277',
-  nonce: '0x084e43d58fdf54f036',
+  r2: '0x4c5a57590544b7fca1f042da3a96b79e66adbaec407b3b7b015db3c30f9837c2',
+  s2: '0x3b355fbd053553b4f9bcbc6b002d694c2ffc8524fc471c56469cc33a497f87af',
+  nonce: '0x9a63675d6800fae6da',
 }
 
 describe('ERC721OwnershipChecker circuit', function () {
@@ -42,11 +41,14 @@ describe('ERC721OwnershipChecker circuit', function () {
     // Check the nullifier
     const mimc = await buildMimcSponge()
     const hash = mimc.multiHash([
-      '0xa9f81085e77cf714d223e0d6be04dbc06713325a198304447d70c124e73808c5',
-      '0x0fd319eaa426462ed17e3d8c860ccbc50909522612fc89f92867f1dd0395a277',
-      '0x084e43d58fdf54f036',
+      '0x4c5a57590544b7fca1f042da3a96b79e66adbaec407b3b7b015db3c30f9837c2',
+      '0x3b355fbd053553b4f9bcbc6b002d694c2ffc8524fc471c56469cc33a497f87af',
+      '0x9a63675d6800fae6da',
     ])
-    assert.equal(`0x${mimc.F.toString(hash, 16)}`, utils.hexlify(witness[1]))
+    assert.equal(
+      padZeroesOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
+      utils.hexlify(witness[43])
+    )
   })
   it('should fail because the message is invalid', async function () {
     const invalidInput = {
@@ -55,24 +57,9 @@ describe('ERC721OwnershipChecker circuit', function () {
         48, 120, 98, 102, 55, 52, 52, 56, 51, 68, 66, 57, 49, 52, 49, 57, 50,
         98, 98, 48, 97, 57, 53, 55, 55, 102, 51, 100, 56, 70, 98, 50, 57, 97,
         54, 100, 52, 99, 48, 56, 101, 69, 111, 119, 110, 115, 48, 120, 55, 50,
-        50, 66, 48, 54, 55, 54, 71, 52, 53, 55, 97, 70, 101, 49, 51, 101, 52,
+        50, 66, 48, 54, 55, 54, 70, 52, 53, 55, 97, 70, 101, 49, 51, 101, 52,
         55, 57, 101, 66, 50, 97, 56, 65, 52, 68, 101, 56, 56, 66, 65, 49, 53,
-        66, 50, 99, 54,
-      ],
-    }
-    try {
-      await this.circuit.calculateWitness(invalidInput)
-    } catch (err) {
-      assert(expectedError(err))
-    }
-  })
-  it('should fail because the tokenAddress is invalid', async function () {
-    const invalidInput = {
-      ...input,
-      tokenAddress: [
-        48, 120, 55, 50, 50, 66, 48, 54, 55, 54, 70, 52, 53, 55, 97, 70, 101,
-        49, 51, 101, 52, 55, 57, 101, 66, 50, 97, 56, 65, 52, 68, 101, 56, 56,
-        66, 65, 49, 53, 66, 50, 99, 54,
+        66, 50, 99, 55,
       ],
     }
     try {
