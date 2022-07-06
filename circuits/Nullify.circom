@@ -12,7 +12,7 @@ template Nullify() {
     mimc.ins[0] <== r;
     mimc.ins[1] <== s;
     mimc.ins[2] <== nonce;
-    mimc.k <== 123;
+    mimc.k <== 0;
 
     nullifierHash <== mimc.outs[0];
 }

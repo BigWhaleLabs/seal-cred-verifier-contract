@@ -39,7 +39,6 @@ template EmailOwnershipChecker() {
   }
   M === mimc7.out;
   // Create nullifier
-  var sigLength = 3;
   signal input r2;
   signal input s2;
   signal input nonce;
@@ -48,6 +47,7 @@ template EmailOwnershipChecker() {
   nullifier.r <== r2;
   nullifier.s <== s2;
   nullifier.nonce <== nonce;
+  
   signal output nullifierHash <== nullifier.nullifierHash;
 }
 

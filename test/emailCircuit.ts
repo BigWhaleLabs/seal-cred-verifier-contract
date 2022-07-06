@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 import { wasm as wasmTester } from 'circom_tester'
-// import { utils } from 'ethers'
+import { utils } from 'ethers'
+import { buildMimcSponge } from 'circomlibjs'
 
 const expectedError = (err) => err.message.includes('Assert Failed')
 
@@ -30,7 +31,7 @@ const input = {
   nonce: '0xe9faa571fbc4a5f380',
 }
 
-describe('ERC721OwnershipChecker circuit', function () {
+describe('EmailOwnershipChecker circuit', function () {
   before(async function () {
     this.circuit = await wasmTester('circuits/EmailOwnershipChecker.circom')
   })
@@ -39,9 +40,13 @@ describe('ERC721OwnershipChecker circuit', function () {
     const witness = await this.circuit.calculateWitness(input)
     await this.circuit.assertOut(witness, {})
     // Check the nullifier
-    // const nullifier = witness.slice(1, 1 + 14).map((d) => Number(d))
-    // const nullifierFromInput = input.message.slice(-14)
-    // assert.equal(utils.hexlify(nullifier), utils.hexlify(nullifierFromInput))
+    const mimc = await buildMimcSponge()
+    const hash = mimc.multiHash([
+      '0xa9f81085e77cf714d223e0d6be04dbc06713325a198304447d70c124e73808c5',
+      '0x0fd319eaa426462ed17e3d8c860ccbc50909522612fc89f92867f1dd0395a277',
+      '0xe9faa571fbc4a5f380',
+    ])
+    assert.equal(utils.hexlify(hash), utils.hexlify(witness[1]))
   })
   it('should fail because the message is invalid', async function () {
     const invalidInput = {
