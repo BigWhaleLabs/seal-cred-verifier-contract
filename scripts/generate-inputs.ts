@@ -35,38 +35,6 @@ async function getSignatureInputs(message = 'For SealCred') {
   return { r2, s2, nonce: `0x${entropy.string()}` }
 }
 
-async function generateERC721Input() {
-  // Message
-  const ownerAddress = '0xbf74483DB914192bb0a9577f3d8Fb29a6d4c08eE'
-  const tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6'
-  const message = `${ownerAddress}owns${tokenAddress}`
-  const messageUInt8 = utils.toUtf8Bytes(message)
-  const mimc7 = await buildMimc7()
-  const M = mimc7.multiHash(messageUInt8)
-  // EdDSA
-  const { publicKey, signature } = await eddsaSign(M)
-  // Generating inputs
-  const babyJub = await buildBabyjub()
-  const F = babyJub.F
-  const inputs = {
-    message: Array.from(messageUInt8),
-    pubKeyX: F.toObject(publicKey[0]).toString(),
-    pubKeyY: F.toObject(publicKey[1]).toString(),
-    R8x: F.toObject(signature.R8[0]).toString(),
-    R8y: F.toObject(signature.R8[1]).toString(),
-    S: signature.S.toString(),
-    M: F.toObject(M).toString(),
-    ...(await getSignatureInputs()),
-  }
-  // Writing inputs
-  writeFileSync(
-    resolve(cwd(), 'inputs/input-erc721.json'),
-    JSON.stringify(inputs),
-    'utf-8'
-  )
-  console.log('Generated input-erc721.json!')
-}
-
 async function generateEmailInput() {
   const maxDomainLength = 90
   // Message
@@ -101,10 +69,10 @@ async function generateEmailInput() {
   console.log('Generated input-email.json!')
 }
 
-async function generateEthereumBalanceInput() {
+async function generateBalanceInput() {
   // Message
   const ownerAddress = '0xbf74483DB914192bb0a9577f3d8Fb29a6d4c08eE'
-  const tokenAddress = '0x0000000000000000000000000000000000000000'
+  const tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6'
   const balance = '0x6b87c4e204970e6'
   const message = `${ownerAddress}owns${tokenAddress}g`
   const messageUInt8 = utils.toUtf8Bytes(message)
@@ -118,7 +86,7 @@ async function generateEthereumBalanceInput() {
   const inputs = {
     message: Array.from(messageUInt8),
     balance,
-    threshold: '0x0',
+    threshold: '0x1',
     pubKeyX: F.toObject(publicKey[0]).toString(),
     pubKeyY: F.toObject(publicKey[1]).toString(),
     R8x: F.toObject(signature.R8[0]).toString(),
@@ -129,11 +97,11 @@ async function generateEthereumBalanceInput() {
   }
   // Writing inputs
   writeFileSync(
-    resolve(cwd(), 'inputs/input-ethereum-balance.json'),
+    resolve(cwd(), 'inputs/input-balance.json'),
     JSON.stringify(inputs),
     'utf-8'
   )
-  console.log('Generated input-ethereum-balance.json!')
+  console.log('Generated input-balance.json!')
 }
 
 ;(async () => {
@@ -142,7 +110,6 @@ async function generateEthereumBalanceInput() {
     'EdDSA public key',
     BigNumber.from(await ed.getPublicKey(privateKeyBytes)).toString()
   )
-  await generateERC721Input()
   await generateEmailInput()
-  await generateEthereumBalanceInput()
+  await generateBalanceInput()
 })()

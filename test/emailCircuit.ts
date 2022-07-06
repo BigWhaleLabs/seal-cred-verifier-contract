@@ -39,11 +39,7 @@ describe('EmailOwnershipChecker circuit', function () {
     await this.circuit.assertOut(witness, {})
     // Check the nullifier
     const mimc = await buildMimcSponge()
-    const hash = mimc.multiHash([
-      '0x4c5a57590544b7fca1f042da3a96b79e66adbaec407b3b7b015db3c30f9837c2',
-      '0x3b355fbd053553b4f9bcbc6b002d694c2ffc8524fc471c56469cc33a497f87af',
-      '0x2f61098bba9fc34541',
-    ])
+    const hash = mimc.multiHash([input.r2, input.s2, input.nonce])
     assert.equal(
       padZeroesOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
       utils.hexlify(witness[91])
