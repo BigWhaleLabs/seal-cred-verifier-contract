@@ -37,7 +37,7 @@ describe('BalanceChecker circuit', function () {
     this.circuit = await wasmTester('circuits/BalanceChecker.circom')
   })
 
-  it.only('should generate the witness successfully', async function () {
+  it('should generate the witness successfully', async function () {
     const witness = await this.circuit.calculateWitness(input)
     await this.circuit.assertOut(witness, {})
     // Check the nullifier

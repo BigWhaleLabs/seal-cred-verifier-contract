@@ -1,9 +1,9 @@
 pragma circom 2.0.4;
 
-include "../node_modules/circomlib/circuits/eddsamimc.circom";
 include "../node_modules/circomlib/circuits/mimc.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
 include "./Nullify.circom";
+include "./EdDSAValidator.circom";
 
 template EmailOwnershipChecker() {
   var domainLength = 90;
@@ -24,21 +24,16 @@ template EmailOwnershipChecker() {
   signal input S;
   signal input M;
 
-  component verifier = EdDSAMiMCVerifier();
-  verifier.enabled <== 1;
-  verifier.Ax <== pubKeyX;
-  verifier.Ay <== pubKeyY;
-  verifier.R8x <== R8x;
-  verifier.R8y <== R8y;
-  verifier.S <== S;
-  verifier.M <== M;
-  // Check if the EdDSA's "M" is "message" hashed
-  component mimc7 = MultiMiMC7(messageLength, 91);
-  mimc7.k <== 0;
+  component edDSAValidator = EdDSAValidator(messageLength);
+  edDSAValidator.pubKeyX <== pubKeyX;
+  edDSAValidator.pubKeyY <== pubKeyY;
+  edDSAValidator.R8x <== R8x;
+  edDSAValidator.R8y <== R8y;
+  edDSAValidator.S <== S;
+  edDSAValidator.messageHash <== M;
   for (var i = 0; i < messageLength; i++) {
-    mimc7.in[i] <== message[i];
+    edDSAValidator.message[i] <== message[i];
   }
-  M === mimc7.out;
   // Create nullifier
   signal input r2;
   signal input s2;

@@ -1,9 +1,9 @@
 pragma circom 2.0.4;
 
-include "../node_modules/circomlib/circuits/eddsamimc.circom";
 include "../node_modules/circomlib/circuits/mimc.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
 include "./Nullify.circom";
+include "./EdDSAValidator.circom";
 
 template BalanceChecker() {
   var addressLength = 42;
@@ -25,25 +25,19 @@ template BalanceChecker() {
   signal input R8y;
   signal input S;
   signal input M;
-
-  component verifier = EdDSAMiMCVerifier();
-  verifier.enabled <== 1;
-  verifier.Ax <== pubKeyX;
-  verifier.Ay <== pubKeyY;
-  verifier.R8x <== R8x;
-  verifier.R8y <== R8y;
-  verifier.S <== S;
-  verifier.M <== M;
-  // Check if the EdDSA's "M" is "message" hashed
   signal input balance;
 
-  component mimc7 = MultiMiMC7(messageLength + 1, 91);
-  mimc7.k <== 0;
+  component edDSAValidator = EdDSAValidator(messageLength + 1);
+  edDSAValidator.pubKeyX <== pubKeyX;
+  edDSAValidator.pubKeyY <== pubKeyY;
+  edDSAValidator.R8x <== R8x;
+  edDSAValidator.R8y <== R8y;
+  edDSAValidator.S <== S;
+  edDSAValidator.messageHash <== M;
   for (var i = 0; i < messageLength; i++) {
-    mimc7.in[i] <== message[i];
+    edDSAValidator.message[i] <== message[i];
   }
-  mimc7.in[messageLength] <== balance;
-  M === mimc7.out;
+  edDSAValidator.message[messageLength] <== balance;
   // Get the network
   signal output network <== message[addressLength];
   // Check if the balance is over threshold
