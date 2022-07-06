@@ -8,7 +8,7 @@ import getBalanceInputs from '../utils/getBalanceInputs'
 import getEmailInputs from '../utils/getEmailInputs'
 
 async function generateEmailInput() {
-  const inputs = getEmailInputs()
+  const inputs = await getEmailInputs()
   // Writing inputs
   writeFileSync(
     resolve(cwd(), 'inputs/input-email.json'),
@@ -19,7 +19,7 @@ async function generateEmailInput() {
 }
 
 async function generateBalanceInput() {
-  const inputs = getBalanceInputs()
+  const inputs = await getBalanceInputs()
   // Writing inputs
   writeFileSync(
     resolve(cwd(), 'inputs/input-balance.json'),
