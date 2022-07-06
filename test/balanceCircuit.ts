@@ -38,17 +38,10 @@ describe('BalanceChecker circuit', function () {
   }
   for (const balance of testValues) {
     for (const threshold of testValues) {
-      if (balance.gte(threshold)) {
-        resultsToInputs.success.push([
-          balance.toHexString(),
-          threshold.toHexString(),
-        ])
-      } else {
-        resultsToInputs.failure.push([
-          balance.toHexString(),
-          threshold.toHexString(),
-        ])
-      }
+      const inputs = balance.gte(threshold)
+        ? resultsToInputs.success
+        : resultsToInputs.failure
+      inputs.push([balance.toHexString(), threshold.toHexString()])
     }
   }
   for (const [balance, threshold] of resultsToInputs.success) {
