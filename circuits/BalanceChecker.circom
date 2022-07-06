@@ -43,10 +43,10 @@ template BalanceChecker() {
   // Check if the balance is over threshold
   signal input threshold;
 
-  // TODO: check if the balance is over threshold
-  // component lte = LessEqThan(2);
-  // lte.in[0] <== threshold;
-  // lte.in[1] <== balance;
+  component lte = LessEqThan(252);
+  lte.in[0] <== threshold;
+  lte.in[1] <== balance;
+  lte.out === 1;
   // Create nullifier
   signal input r2;
   signal input s2;
