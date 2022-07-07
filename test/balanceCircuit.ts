@@ -25,7 +25,7 @@ describe('BalanceChecker circuit', function () {
       utils.hexlify(witness[44])
     )
   })
-  it('should return the correct network byte', async function () {
+  it('should return the correct network byte for mainnet', async function () {
     const inputs = await getBalanceInputs(
       undefined,
       undefined,
@@ -35,17 +35,19 @@ describe('BalanceChecker circuit', function () {
     )
     const witness = await this.circuit.calculateWitness(inputs)
     await this.circuit.assertOut(witness, {})
-    expect(witness[92]).to.be.deep.equal(BigNumber.from(0x6d))
-    const inputs2 = await getBalanceInputs(
+    expect(witness[43]).to.be.deep.equal(BigNumber.from(0x6d))
+  })
+  it('should return the correct network byte for goerli', async function () {
+    const inputs = await getBalanceInputs(
       undefined,
       undefined,
       undefined,
       undefined,
       'g'
     )
-    const witness2 = await this.circuit.calculateWitness(inputs2)
-    await this.circuit.assertOut(witness2, {})
-    expect(witness2[92]).to.be.deep.equal(BigNumber.from(0x67))
+    const witness = await this.circuit.calculateWitness(inputs)
+    await this.circuit.assertOut(witness, {})
+    expect(witness[43]).to.be.deep.equal(BigNumber.from(0x67))
   })
   // Generate and test possible edge cases
   const testValues = [zero, '0x1', '0x6b87c4e204970e6', maxUInt256].map((v) =>

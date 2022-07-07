@@ -65,7 +65,7 @@ template BalanceChecker() {
   // Check if attestors are the same
   pubKeyXToken === pubKeyXAddress;
   // Get the network
-  signal output network <== messageToken[addressLength];
+  signal output network <== messageToken[messageTokenLength - 1];
   // Check if the balance is over threshold
   signal input threshold;
 
