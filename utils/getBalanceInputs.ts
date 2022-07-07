@@ -36,13 +36,13 @@ export default async function (
   tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6'
 ) {
   return {
+    ...(await inputsForMessage(ownerAddress, 'Address')),
     ...(await inputsForMessage(
       `${ownerAddress}owns${tokenAddress}g`,
       'Token',
       balance,
       threshold
     )),
-    ...(await inputsForMessage(ownerAddress, 'Address')),
     ...(await getSignatureInputs()),
   }
 }
