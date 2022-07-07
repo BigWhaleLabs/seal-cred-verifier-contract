@@ -30,7 +30,6 @@ Also check out the `.env.example` file for more information.
 - `yarn build` — compiles the contract ts interface to the `typechain` directory
 - `yarn compile-balance` and `yarn compile-email` - compiles the circom circuits, creates proof, verifies proof, exports verifier as a solidity file
 - `yarn test` — runs the test suite
-- `yarn test-report-gas` — runs the test suite and reports the gas usage
 - `yarn deploy` — deploys the contract to the network
 - `yarn eth-lint` — runs the linter for the solidity contract
 - `yarn lint` — runs all the linters

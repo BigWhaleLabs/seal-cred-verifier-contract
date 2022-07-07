@@ -20,8 +20,7 @@
   "types": "dist/typechain/index.d.ts",
   "scripts": {
     "build": "yarn hardhat compile",
-    "test": "yarn hardhat test --parallel",
-    "test-report-gas": "yarn hardhat test",
+    "test": "yarn hardhat test",
     "coverage": "yarn hardhat compile --force && node --max_old_space_size=6144 node_modules/.bin/hardhat coverage --testfiles 'test/**/*.ts' --show-stack-traces",
     "deploy": "yarn hardhat run --network deploy scripts/deploy.ts",
     "eth-lint": "yarn solhint 'contracts/**/*.sol'",

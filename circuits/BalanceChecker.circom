@@ -9,37 +9,63 @@ template BalanceChecker() {
   var addressLength = 42;
   var ownsWordLength = 4;
   var networkLength = 1;
-  var messageLength = addressLength + ownsWordLength + addressLength + networkLength;
+  var messageTokenLength = addressLength + ownsWordLength + addressLength + networkLength;
+  // Get messages
+  signal input messageToken[messageTokenLength];
+  signal input messageAddress[addressLength];
+  // Check if token owner address is the same
+  for (var i = 0; i < addressLength; i++) {
+    messageToken[i] === messageAddress[i];
+  }
   // Export token address
   var tokenAddressIndex = addressLength + ownsWordLength;
-  signal input message[messageLength];
   
   signal output tokenAddress[addressLength];
   for (var i = 0; i < addressLength; i++) {
-    tokenAddress[i] <== message[tokenAddressIndex + i];
+    tokenAddress[i] <== messageToken[tokenAddressIndex + i];
   }
-  // Check if the EdDSA signature is valid
-  signal input pubKeyX;
-  signal input pubKeyY;
-  signal input R8x;
-  signal input R8y;
-  signal input S;
-  signal input M;
+  // Check if the EdDSA signature of token balance is valid
+  signal input pubKeyXToken;
+  signal input pubKeyYToken;
+  signal input R8xToken;
+  signal input R8yToken;
+  signal input SToken;
+  signal input MToken;
   signal input balance;
 
-  component edDSAValidator = EdDSAValidator(messageLength + 1);
-  edDSAValidator.pubKeyX <== pubKeyX;
-  edDSAValidator.pubKeyY <== pubKeyY;
-  edDSAValidator.R8x <== R8x;
-  edDSAValidator.R8y <== R8y;
-  edDSAValidator.S <== S;
-  edDSAValidator.messageHash <== M;
-  for (var i = 0; i < messageLength; i++) {
-    edDSAValidator.message[i] <== message[i];
+  component edDSAValidatorToken = EdDSAValidator(messageTokenLength + 1);
+  edDSAValidatorToken.pubKeyX <== pubKeyXToken;
+  edDSAValidatorToken.pubKeyY <== pubKeyYToken;
+  edDSAValidatorToken.R8x <== R8xToken;
+  edDSAValidatorToken.R8y <== R8yToken;
+  edDSAValidatorToken.S <== SToken;
+  edDSAValidatorToken.messageHash <== MToken;
+  for (var i = 0; i < messageTokenLength; i++) {
+    edDSAValidatorToken.message[i] <== messageToken[i];
   }
-  edDSAValidator.message[messageLength] <== balance;
+  edDSAValidatorToken.message[messageTokenLength] <== balance;
+  // Check if the EdDSA signature of address is valid
+  signal input pubKeyXAddress;
+  signal input pubKeyYAddress;
+  signal input R8xAddress;
+  signal input R8yAddress;
+  signal input SAddress;
+  signal input MAddress;
+
+  component edDSAValidatorAddress = EdDSAValidator(addressLength);
+  edDSAValidatorAddress.pubKeyX <== pubKeyXAddress;
+  edDSAValidatorAddress.pubKeyY <== pubKeyYAddress;
+  edDSAValidatorAddress.R8x <== R8xAddress;
+  edDSAValidatorAddress.R8y <== R8yAddress;
+  edDSAValidatorAddress.S <== SAddress;
+  edDSAValidatorAddress.messageHash <== MAddress;
+  for (var i = 0; i < addressLength; i++) {
+    edDSAValidatorAddress.message[i] <== messageAddress[i];
+  }
+  // Check if attestors are the same
+  pubKeyXToken === pubKeyXAddress;
   // Get the network
-  signal output network <== message[addressLength];
+  signal output network <== messageToken[addressLength];
   // Check if the balance is over threshold
   signal input threshold;
 
@@ -60,4 +86,4 @@ template BalanceChecker() {
   signal output nullifierHash <== nullifier.nullifierHash;
 }
 
-component main{public [threshold, pubKeyX]} = BalanceChecker();
+component main{public [threshold, pubKeyXToken]} = BalanceChecker();
