@@ -33,12 +33,13 @@ export default async function (
   balance = '0x6b87c4e204970e6',
   threshold = '0x1',
   ownerAddress = '0xbf74483DB914192bb0a9577f3d8Fb29a6d4c08eE',
-  tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6'
+  tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6',
+  network: 'g' | 'm' = 'g'
 ) {
   return {
     ...(await inputsForMessage(ownerAddress, 'Address')),
     ...(await inputsForMessage(
-      `${ownerAddress}owns${tokenAddress}g`,
+      `${ownerAddress}owns${tokenAddress}${network}`,
       'Token',
       balance,
       threshold

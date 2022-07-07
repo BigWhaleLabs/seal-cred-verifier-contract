@@ -1,4 +1,4 @@
-import { assert } from 'chai'
+import { assert, expect } from 'chai'
 import { wasm as wasmTester } from 'circom_tester'
 import { BigNumber, utils } from 'ethers'
 import { buildMimcSponge } from 'circomlibjs'
@@ -24,6 +24,28 @@ describe('BalanceChecker circuit', function () {
       padZerosOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
       utils.hexlify(witness[44])
     )
+  })
+  it('should return the correct network byte', async function () {
+    const inputs = await getBalanceInputs(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'm'
+    )
+    const witness = await this.circuit.calculateWitness(inputs)
+    await this.circuit.assertOut(witness, {})
+    expect(witness[92]).to.be.deep.equal(BigNumber.from(0x6d))
+    const inputs2 = await getBalanceInputs(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'g'
+    )
+    const witness2 = await this.circuit.calculateWitness(inputs2)
+    await this.circuit.assertOut(witness2, {})
+    expect(witness2[92]).to.be.deep.equal(BigNumber.from(0x67))
   })
   // Generate and test possible edge cases
   const testValues = [zero, '0x1', '0x6b87c4e204970e6', maxUInt256].map((v) =>
