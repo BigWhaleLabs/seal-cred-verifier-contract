@@ -42,7 +42,7 @@ export default async function (
       balance,
       threshold
     )),
-    ...(await inputsForMessage(ownerAddress, 'Address', balance, threshold)),
+    ...(await inputsForMessage(ownerAddress, 'Address')),
     ...(await getSignatureInputs()),
   }
 }
