@@ -1,8 +1,8 @@
-import { BigNumber, utils } from 'ethers'
-import { writeFileSync } from 'fs'
 import * as ed from '@noble/ed25519'
-import { resolve } from 'path'
+import { BigNumber, utils } from 'ethers'
 import { cwd } from 'process'
+import { resolve } from 'path'
+import { writeFileSync } from 'fs'
 import eddsaPrivateKeyBytes from '../utils/eddsaPrivateKeyBytes'
 import getBalanceInputs from '../utils/getBalanceInputs'
 import getEmailInputs from '../utils/getEmailInputs'
@@ -29,7 +29,7 @@ async function generateBalanceInput() {
   console.log('Generated input-balance.json!')
 }
 
-;(async () => {
+void (async () => {
   console.log('EdDSA private key', utils.hexlify(eddsaPrivateKeyBytes))
   console.log(
     'EdDSA public key',

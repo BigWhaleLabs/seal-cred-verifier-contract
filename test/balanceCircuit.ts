@@ -1,11 +1,11 @@
-import { assert, expect } from 'chai'
-import { wasm as wasmTester } from 'circom_tester'
 import { BigNumber, utils } from 'ethers'
+import { assert, expect } from 'chai'
 import { buildMimcSponge } from 'circomlibjs'
+import { maxUInt256, zero } from '../utils/constants'
+import { wasm as wasmTester } from 'circom_tester'
+import expectAssertFailure from '../utils/expectAssertFailure'
 import getBalanceInputs from '../utils/getBalanceInputs'
 import padZerosOnLeftHexString from '../utils/padZerosOnLeftHexString'
-import { maxUInt256, zero } from '../utils/constants'
-import expectAssertFailure from '../utils/expectAssertFailure'
 
 describe('BalanceChecker circuit', function () {
   before(async function () {

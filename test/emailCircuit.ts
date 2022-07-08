@@ -1,10 +1,10 @@
 import { assert } from 'chai'
-import { wasm as wasmTester } from 'circom_tester'
-import { utils } from 'ethers'
 import { buildMimcSponge } from 'circomlibjs'
+import { utils } from 'ethers'
+import { wasm as wasmTester } from 'circom_tester'
+import expectAssertFailure from '../utils/expectAssertFailure'
 import getEmailInputs from '../utils/getEmailInputs'
 import padZerosOnLeftHexString from '../utils/padZerosOnLeftHexString'
-import expectAssertFailure from '../utils/expectAssertFailure'
 
 describe('EmailOwnershipChecker circuit', function () {
   before(async function () {

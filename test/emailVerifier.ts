@@ -1,6 +1,6 @@
-import { expect } from 'chai'
-import { ethers } from 'hardhat'
 import { Proof } from '../utils/Proof'
+import { ethers } from 'hardhat'
+import { expect } from 'chai'
 import getSolidityCallProof from '../utils/getSolidityCallProof'
 
 describe('EmailOwnershipCheckerVerifier contract', function () {
