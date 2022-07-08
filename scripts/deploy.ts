@@ -2,6 +2,7 @@ import { cwd } from 'process'
 import { ethers, run } from 'hardhat'
 import { readdirSync } from 'fs'
 import { resolve } from 'path'
+import { utils } from 'ethers'
 
 async function main() {
   const [deployer] = await ethers.getSigners()
@@ -23,8 +24,14 @@ async function main() {
   for (const verifierContractName of contractNames) {
     const Verifier = await ethers.getContractFactory(verifierContractName)
     const verifier = await Verifier.deploy()
-    console.log('Deploy tx gas price:', verifier.deployTransaction.gasPrice)
-    console.log('Deploy tx gas limit:', verifier.deployTransaction.gasLimit)
+    console.log(
+      'Deploy tx gas price:',
+      utils.formatEther(verifier.deployTransaction.gasPrice || 0)
+    )
+    console.log(
+      'Deploy tx gas limit:',
+      utils.formatEther(verifier.deployTransaction.gasLimit)
+    )
     await verifier.deployed()
     const address = verifier.address
     console.log('Contract deployed to:', address)
