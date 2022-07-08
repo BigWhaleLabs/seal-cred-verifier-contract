@@ -25,6 +25,7 @@ async function main() {
     s.substring(0, s.length - 4)
   )
   for (const verifierContractName of contractNames) {
+    console.log(`Deploying ${verifierContractName}...`)
     const Verifier = await ethers.getContractFactory(verifierContractName)
     const verifier = await Verifier.deploy()
     console.log(
