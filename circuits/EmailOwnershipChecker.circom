@@ -37,12 +37,10 @@ template EmailOwnershipChecker() {
   // Create nullifier
   signal input r2;
   signal input s2;
-  signal input nonce;
 
   component nullifier = Nullify();
   nullifier.r <== r2;
   nullifier.s <== s2;
-  nullifier.nonce <== nonce;
   
   signal output nullifierHash <== nullifier.nullifierHash;
 }

@@ -19,7 +19,7 @@ describe('BalanceChecker circuit', function () {
     await this.circuit.assertOut(witness, {})
     // Check the nullifier
     const mimc = await buildMimcSponge()
-    const hash = mimc.multiHash([inputs.r2, inputs.s2, inputs.nonce])
+    const hash = mimc.multiHash([inputs.r2, inputs.s2])
     assert.equal(
       padZerosOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
       utils.hexlify(witness[44])
