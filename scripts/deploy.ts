@@ -3,6 +3,7 @@ import { ethers, run } from 'hardhat'
 import { readdirSync } from 'fs'
 import { resolve } from 'path'
 import { utils } from 'ethers'
+import { version } from '../package.json'
 
 async function main() {
   const [deployer] = await ethers.getSigners()
@@ -27,7 +28,7 @@ async function main() {
   for (const verifierContractName of contractNames) {
     console.log(`Deploying ${verifierContractName}...`)
     const Verifier = await ethers.getContractFactory(verifierContractName)
-    const verifier = await Verifier.deploy()
+    const verifier = await Verifier.deploy(version)
     console.log(
       'Deploy tx gas price:',
       utils.formatEther(verifier.deployTransaction.gasPrice || 0)
@@ -45,6 +46,7 @@ async function main() {
     try {
       await run('verify:verify', {
         address,
+        constructorArguments: [version],
       })
     } catch (err) {
       console.log(
