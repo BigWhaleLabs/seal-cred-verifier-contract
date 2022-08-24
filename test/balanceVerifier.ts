@@ -1,14 +1,20 @@
 import { Proof } from '../utils/Proof'
 import { ethers } from 'hardhat'
 import { expect } from 'chai'
+import { version } from '../package.json'
 import getSolidityCallProof from '../utils/getSolidityCallProof'
 
 describe('BalanceCheckerVerifier contract', function () {
   before(async function () {
     const factory = await ethers.getContractFactory('BalanceCheckerVerifier')
-    this.contract = await factory.deploy()
+    this.contract = await factory.deploy(version)
     await this.contract.deployed()
     this.proof = await getSolidityCallProof('balance')
+  })
+  describe('Constructor', function () {
+    it('should deploy the contract with the correct fields', async function () {
+      expect(await this.contract.version()).to.equal(version)
+    })
   })
 
   it('should successfully verify correct proof', async function () {
