@@ -61,4 +61,8 @@ pragma solidity ^0.8.14;
 
 contract Versioned {
   string public version;
+
+  constructor(string memory _version) {
+    version = _version;
+  }
 }
