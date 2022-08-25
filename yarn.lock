@@ -53,6 +53,7 @@ __metadata:
   resolution: "@big-whale-labs/seal-cred-verifier-contract@workspace:."
   dependencies:
     "@big-whale-labs/constants": ^0.1.10
+    "@big-whale-labs/versioned-contract": ^1.0.1
     "@noble/ed25519": ^1.6.1
     "@nomiclabs/hardhat-ethers": ^2.1.0
     "@nomiclabs/hardhat-etherscan": ^3.1.0
@@ -96,6 +97,13 @@ __metadata:
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
+
+"@big-whale-labs/versioned-contract@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@big-whale-labs/versioned-contract@npm:1.0.1"
+  checksum: 11199e56033d110ac165ffca5652f6c3efebe8b50c84218d823204bcde2a633593d6dc0e85ed04e0f22af15888b58fc1a31c39f643999b6e65b18ffa7cc80a08
+  languageName: node
+  linkType: hard
 
 "@cspotcode/source-map-support@npm:^0.8.0":
   version: 0.8.1
