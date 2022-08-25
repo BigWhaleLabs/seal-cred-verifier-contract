@@ -13,7 +13,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.14;
 
-import "./Versioned.sol";
+import "@big-whale-labs/versioned-contract/contracts/Versioned.sol";
 
 library Pairing {
   struct G1Point {
