@@ -6,28 +6,7 @@ import { writeFileSync } from 'fs'
 import eddsaPrivateKeyBytes from '../utils/eddsaPrivateKeyBytes'
 import getBalanceInputs from '../utils/getBalanceInputs'
 import getEmailInputs from '../utils/getEmailInputs'
-
-async function generateEmailInput() {
-  const inputs = await getEmailInputs()
-  // Writing inputs
-  writeFileSync(
-    resolve(cwd(), 'inputs/input-email.json'),
-    JSON.stringify(inputs),
-    'utf-8'
-  )
-  console.log('Generated input-email.json!')
-}
-
-async function generateBalanceInput() {
-  const inputs = await getBalanceInputs()
-  // Writing inputs
-  writeFileSync(
-    resolve(cwd(), 'inputs/input-balance.json'),
-    JSON.stringify(inputs),
-    'utf-8'
-  )
-  console.log('Generated input-balance.json!')
-}
+import getFarcasterInputs from '../utils/getFarcasterInputs'
 
 void (async () => {
   console.log('EdDSA private key', utils.hexlify(eddsaPrivateKeyBytes))
@@ -35,6 +14,19 @@ void (async () => {
     'EdDSA public key',
     BigNumber.from(await ed.getPublicKey(eddsaPrivateKeyBytes)).toString()
   )
-  await generateEmailInput()
-  await generateBalanceInput()
+  const inputs = {
+    email: getEmailInputs,
+    balance: getBalanceInputs,
+    farcaster: getFarcasterInputs,
+  }
+  for (const [name, fn] of Object.entries(inputs)) {
+    const inputs = await fn()
+    // Writing inputs
+    writeFileSync(
+      resolve(cwd(), 'inputs', `input-${name}.json`),
+      JSON.stringify(inputs),
+      'utf-8'
+    )
+    console.log(`Generated input-${name}.json!`)
+  }
 })()
