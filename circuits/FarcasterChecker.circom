@@ -19,7 +19,7 @@ template FarcasterChecker() {
   var farcasterIndex = addressLength + ownsWordLength;
   
   signal output farcaster[farcasterWordLength];
-  for (var i = 0; i < farcasterIndex; i++) {
+  for (var i = 0; i < farcasterWordLength; i++) {
     farcaster[i] <== messageFarcaster[farcasterIndex + i];
   }
   // Check if the EdDSA signature of farcaster is valid
@@ -71,4 +71,4 @@ template FarcasterChecker() {
   signal output nullifierHash <== nullifier.nullifierHash;
 }
 
-component main{public [pubKeyXFarcaster]} = BalanceChecker();
+component main{public [pubKeyXFarcaster]} = FarcasterChecker();
