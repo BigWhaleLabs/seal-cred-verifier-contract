@@ -1,6 +1,5 @@
 pragma circom 2.0.4;
 
-include "../node_modules/circomlib/circuits/mimc.circom";
 include "../node_modules/circomlib/circuits/comparators.circom";
 include "./helpers/Nullify.circom";
 include "./helpers/EdDSAValidator.circom";
