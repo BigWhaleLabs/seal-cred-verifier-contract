@@ -34,12 +34,12 @@ describe('FarcasterChecker circuit', function () {
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the messageAddress is invalid', async function () {
+  it('should fail because the messageFarcaster is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      messageAddress: [
-        ...this.baseInputs.messageAddress.slice(0, -1),
-        this.baseInputs.messageAddress.at(-1) + 1,
+      messageFarcaster: [
+        ...this.baseInputs.messageFarcaster.slice(0, -1),
+        this.baseInputs.messageFarcaster.at(-1) + 1,
       ],
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
@@ -137,6 +137,20 @@ describe('FarcasterChecker circuit', function () {
       ...this.baseInputs,
       MFarcaster:
         '73413802277671090077825408377457349715196153372506772912948865981934166990',
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
+  it('should fail because the r2 is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      r2: '0x4822f26920ec61ad450a8d6bca25abe4ace8e7ddb7e4008649eef9524c8a5c25',
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
+  it('should fail because the s2 is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      s2: '0x92f041af922a04257d777e8eea8d58776398eb2a40b63594f3cc5d55f45f7d73',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
