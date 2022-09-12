@@ -1,13 +1,12 @@
-import { BigNumber, utils } from 'ethers'
-import { assert, expect } from 'chai'
+import { assert } from 'chai'
 import { buildMimcSponge } from 'circomlibjs'
-import { maxUInt256, zero } from '../utils/constants'
+import { utils } from 'ethers'
 import { wasm as wasmTester } from 'circom_tester'
 import expectAssertFailure from '../utils/expectAssertFailure'
 import getFarcasterInputs from '../utils/getFarcasterInputs'
 import padZerosOnLeftHexString from '../utils/padZerosOnLeftHexString'
 
-describe.only('FarcasterChecker circuit', function () {
+describe('FarcasterChecker circuit', function () {
   before(async function () {
     this.circuit = await wasmTester('circuits/FarcasterChecker.circom')
     this.baseInputs = await getFarcasterInputs()
@@ -20,34 +19,11 @@ describe.only('FarcasterChecker circuit', function () {
     // Check the nullifier
     const mimc = await buildMimcSponge()
     const hash = mimc.multiHash([inputs.r2, inputs.s2])
-    console.log(
-      padZerosOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
-      utils.hexlify(witness[9])
-    )
     assert.equal(
       padZerosOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
-      utils.hexlify(witness[9])
+      utils.hexlify(witness[10])
     )
   })
-  // Generate and test possible edge cases
-  const testValues = [zero, '0x1', '0x6b87c4e204970e6', maxUInt256].map((v) =>
-    BigNumber.from(v)
-  )
-  const resultsToInputs = {
-    success: [],
-    failure: [],
-  } as {
-    success: string[][]
-    failure: string[][]
-  }
-  for (const balance of testValues) {
-    for (const threshold of testValues) {
-      const inputs = balance.gte(threshold)
-        ? resultsToInputs.success
-        : resultsToInputs.failure
-      inputs.push([balance.toHexString(), threshold.toHexString()])
-    }
-  }
   it('should fail because the messageAddress is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
