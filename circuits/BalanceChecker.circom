@@ -3,12 +3,15 @@ pragma circom 2.0.4;
 include "../node_modules/circomlib/circuits/comparators.circom";
 include "./helpers/Nullify.circom";
 include "./helpers/EdDSAValidator.circom";
+include "./helpers/MerkleTree.circom";
+include "./helpers/CommitmentHasher.circom";
 
 template BalanceChecker() {
+  var levels = 20;
+  var rootLength = 64;
   var addressLength = 42;
-  var ownsWordLength = 4;
   var networkLength = 1;
-  var messageTokenLength = addressLength + ownsWordLength + addressLength + networkLength;
+  var messageTokenLength = rootLength + addressLength + networkLength;
   // Get messages
   signal input messageToken[messageTokenLength];
   signal input messageAddress[addressLength];
@@ -17,7 +20,7 @@ template BalanceChecker() {
     messageToken[i] === messageAddress[i];
   }
   // Export token address
-  var tokenAddressIndex = addressLength + ownsWordLength;
+  var tokenAddressIndex = addressLength;
   
   signal output tokenAddress[addressLength];
   for (var i = 0; i < addressLength; i++) {
@@ -79,6 +82,26 @@ template BalanceChecker() {
   component nullifier = Nullify();
   nullifier.r <== r2;
   nullifier.s <== s2;
+
+  signal input root;
+  signal input nullifierHash;
+  signal input secret;
+  signal input pathElements[levels];
+  signal input pathIndices[levels];
+
+  component hasher = CommitmentHasher();
+  hasher.nullifier <== nullifier;
+  hasher.secret <== secret;
+  hasher.nullifierHash === nullifierHash;
+
+  component tree = MerkleTreeChecker(levels);
+  tree.leaf <== hasher.commitment;
+  tree.root <== root;
+  
+  for (var i = 0; i < levels; i++) {
+    tree.pathElements[i] <== pathElements[i];
+    tree.pathIndices[i] <== pathIndices[i];
+  }
 
   signal output nullifierHash <== nullifier.nullifierHash;
 }
