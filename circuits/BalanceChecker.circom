@@ -5,12 +5,14 @@ include "./helpers/Nullify.circom";
 include "./helpers/EdDSAValidator.circom";
 include "./helpers/MerkleTree.circom";
 include "./helpers/CommitmentHasher.circom";
+include "./helpers/PubkeyToAddress.circom";
 
-template BalanceChecker() {
+template BalanceChecker(n, k) {
   var levels = 20;
   var rootLength = 64;
   var addressLength = 42;
   var networkLength = 1;
+  signal input pubkey[2][k];
   var messageTokenLength = rootLength + addressLength + networkLength;
   // Get messages
   signal input messageToken[messageTokenLength];
@@ -94,8 +96,22 @@ template BalanceChecker() {
   hasher.secret <== secret;
   hasher.nullifierHash === nullifierHash;
 
+  component flattenPub = FlattenPubkey(n, k);
+    for (var i = 0; i < k; i++) {
+        flattenPub.chunkedPubkey[0][i] <== pubkey[0][i];
+        flattenPub.chunkedPubkey[1][i] <== pubkey[1][i];
+    }
+
+    component addressGen = PubkeyToAddress();
+    for (var i = 0;i < 512;i++) addressGen.pubkeyBits[i] <== flattenPub.pubkeyBits[i];
+    log(addressGen.address);
+
+    component addressMimc = MiMCSponge(1, 220, 1);
+    addressMimc.ins[0] <== addressGen.address;
+    addressMimc.k <== 123;
+
   component tree = MerkleTreeChecker(levels);
-  tree.leaf <== hasher.commitment;
+  tree.leaf <== addressMimc.outs[0];
   tree.root <== root;
   
   for (var i = 0; i < levels; i++) {
@@ -106,4 +122,4 @@ template BalanceChecker() {
   signal output nullifierHash <== nullifier.nullifierHash;
 }
 
-component main{public [threshold, pubKeyXToken]} = BalanceChecker();
+component main{public [threshold, pubKeyXToken]} = BalanceChecker(86, 3);
