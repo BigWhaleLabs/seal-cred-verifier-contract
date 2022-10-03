@@ -4,71 +4,60 @@ include "./helpers/Nullify.circom";
 include "./helpers/EdDSAValidator.circom";
 
 template FarcasterChecker() {
-  var addressLength = 42;
-  var ownsWordLength = 4;
   var farcasterWordLength = 9;
-  var messageFarcasterLength = addressLength + ownsWordLength + farcasterWordLength;
+  var farcasterMessageLength = 2 + farcasterWordLength;
   // Get messages
-  signal input messageFarcaster[messageFarcasterLength];
-  signal input messageAddress[addressLength];
+  signal input farcasterMessage[farcasterMessageLength];
+  signal input address;
+  // Export attestation type
+  signal output attestationType <== farcasterMessage[0];
   // Check if owner address is the same
-  for (var i = 0; i < addressLength; i++) {
-    messageFarcaster[i] === messageAddress[i];
-  }
+  farcasterMessage[1] === address;
   // Export farcaster word
-  var farcasterIndex = addressLength + ownsWordLength;
-  
   signal output farcaster[farcasterWordLength];
   for (var i = 0; i < farcasterWordLength; i++) {
-    farcaster[i] <== messageFarcaster[farcasterIndex + i];
+    farcaster[i] <== farcasterMessage[2 + i];
   }
   // Check if the EdDSA signature of farcaster is valid
-  signal input pubKeyXFarcaster;
-  signal input pubKeyYFarcaster;
-  signal input R8xFarcaster;
-  signal input R8yFarcaster;
-  signal input SFarcaster;
-  signal input MFarcaster;
+  signal input farcasterPubKeyX;
+  signal input farcasterPubKeyY;
+  signal input farcasterR8x;
+  signal input farcasterR8y;
+  signal input farcasterS;
 
-  component edDSAValidatorFarcaster = EdDSAValidator(messageFarcasterLength);
-  edDSAValidatorFarcaster.pubKeyX <== pubKeyXFarcaster;
-  edDSAValidatorFarcaster.pubKeyY <== pubKeyYFarcaster;
-  edDSAValidatorFarcaster.R8x <== R8xFarcaster;
-  edDSAValidatorFarcaster.R8y <== R8yFarcaster;
-  edDSAValidatorFarcaster.S <== SFarcaster;
-  edDSAValidatorFarcaster.messageHash <== MFarcaster;
-  for (var i = 0; i < messageFarcasterLength; i++) {
-    edDSAValidatorFarcaster.message[i] <== messageFarcaster[i];
+  component farcasterEdDSAValidator = EdDSAValidator(farcasterMessageLength);
+  farcasterEdDSAValidator.pubKeyX <== farcasterPubKeyX;
+  farcasterEdDSAValidator.pubKeyY <== farcasterPubKeyY;
+  farcasterEdDSAValidator.R8x <== farcasterR8x;
+  farcasterEdDSAValidator.R8y <== farcasterR8y;
+  farcasterEdDSAValidator.S <== farcasterS;
+  for (var i = 0; i < farcasterMessageLength; i++) {
+    farcasterEdDSAValidator.message[i] <== farcasterMessage[i];
   }
   // Check if the EdDSA signature of address is valid
-  signal input pubKeyXAddress;
-  signal input pubKeyYAddress;
-  signal input R8xAddress;
-  signal input R8yAddress;
-  signal input SAddress;
-  signal input MAddress;
+  signal input addressPubKeyX;
+  signal input addressPubKeyY;
+  signal input addressR8x;
+  signal input addressR8y;
+  signal input addressS;
 
-  component edDSAValidatorAddress = EdDSAValidator(addressLength);
-  edDSAValidatorAddress.pubKeyX <== pubKeyXAddress;
-  edDSAValidatorAddress.pubKeyY <== pubKeyYAddress;
-  edDSAValidatorAddress.R8x <== R8xAddress;
-  edDSAValidatorAddress.R8y <== R8yAddress;
-  edDSAValidatorAddress.S <== SAddress;
-  edDSAValidatorAddress.messageHash <== MAddress;
-  for (var i = 0; i < addressLength; i++) {
-    edDSAValidatorAddress.message[i] <== messageAddress[i];
-  }
+  component edDSAValidatorAddress = EdDSAValidator(1);
+  edDSAValidatorAddress.pubKeyX <== addressPubKeyX;
+  edDSAValidatorAddress.pubKeyY <== addressPubKeyY;
+  edDSAValidatorAddress.R8x <== addressR8x;
+  edDSAValidatorAddress.R8y <== addressR8y;
+  edDSAValidatorAddress.S <== addressS;
+  edDSAValidatorAddress.message[0] <== address;
   // Check if attestors are the same
-  pubKeyXFarcaster === pubKeyXAddress;
+  farcasterPubKeyX === addressPubKeyX;
   // Create nullifier
-  signal input r2;
-  signal input s2;
+  signal input nonce[2];
   
   component nullifier = Nullify();
-  nullifier.r <== r2;
-  nullifier.s <== s2;
+  nullifier.r <== nonce[0];
+  nullifier.s <== nonce[1];
 
   signal output nullifierHash <== nullifier.nullifierHash;
 }
 
-component main{public [pubKeyXFarcaster]} = FarcasterChecker();
+component main{public [farcasterPubKeyX]} = FarcasterChecker();
