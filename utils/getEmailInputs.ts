@@ -12,9 +12,9 @@ export default async function (domain = 'bigwhalelabs.com') {
     maxDomainLength
   )
   const mimc7 = await buildMimc7()
-  const M = mimc7.multiHash(domainBytes)
+  const hash = mimc7.multiHash(domainBytes)
   // EdDSA
-  const { publicKey, signature } = await eddsaSign(M)
+  const { publicKey, signature } = await eddsaSign(hash)
   // Generating inputs
   const babyJub = await buildBabyjub()
   const F = babyJub.F
@@ -25,7 +25,6 @@ export default async function (domain = 'bigwhalelabs.com') {
     R8x: F.toObject(signature.R8[0]).toString(),
     R8y: F.toObject(signature.R8[1]).toString(),
     S: signature.S.toString(),
-    M: F.toObject(M).toString(),
-    ...(await getNonceInputs()),
+    nonce: getNonceInputs(),
   }
 }
