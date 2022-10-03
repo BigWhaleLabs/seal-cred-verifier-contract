@@ -1,7 +1,7 @@
 import { buildBabyjub, buildMimc7 } from 'circomlibjs'
 import { utils } from 'ethers'
 import eddsaSign from './eddsaSign'
-import getSignatureInputs from './getSignatureInputs'
+import getNonceInputs from './getNonceInputs'
 import padZeroesOnRightUint8 from './padZeroesOnRightUint8'
 
 export default async function (domain = 'bigwhalelabs.com') {
@@ -26,6 +26,6 @@ export default async function (domain = 'bigwhalelabs.com') {
     R8y: F.toObject(signature.R8[1]).toString(),
     S: signature.S.toString(),
     M: F.toObject(M).toString(),
-    ...(await getSignatureInputs()),
+    ...(await getNonceInputs()),
   }
 }

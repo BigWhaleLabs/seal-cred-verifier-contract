@@ -49,6 +49,7 @@
     "@types/node": "^18.7.17",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
+    "@zk-kit/incremental-merkle-tree": "^1.0.0",
     "chai": "^4.3.6",
     "circom_tester": "^0.0.18",
     "circomlib": "^2.0.5",

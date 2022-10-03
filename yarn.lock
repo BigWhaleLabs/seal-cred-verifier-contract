@@ -67,6 +67,7 @@ __metadata:
     "@types/node": ^18.7.17
     "@typescript-eslint/eslint-plugin": ^5.37.0
     "@typescript-eslint/parser": ^5.37.0
+    "@zk-kit/incremental-merkle-tree": ^1.0.0
     chai: ^4.3.6
     circom_tester: ^0.0.18
     circomlib: ^2.0.5
@@ -2654,6 +2655,13 @@ __metadata:
   version: 1.1.0
   resolution: "@yarnpkg/lockfile@npm:1.1.0"
   checksum: 05b881b4866a3546861fee756e6d3812776ea47fa6eb7098f983d6d0eefa02e12b66c3fff931574120f196286a7ad4879ce02743c8bb2be36c6a576c7852083a
+  languageName: node
+  linkType: hard
+
+"@zk-kit/incremental-merkle-tree@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@zk-kit/incremental-merkle-tree@npm:1.0.0"
+  checksum: 2b5d7b5cc08cf3aea536d6541a1177221fcacca5b93fb22e37cd05926d138fe69035b73cb42e09798505caf1b7a75ad225027d13d35c2f0d7b216147cafd184e
   languageName: node
   linkType: hard
 

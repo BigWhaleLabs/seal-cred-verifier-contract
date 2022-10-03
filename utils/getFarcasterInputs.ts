@@ -1,7 +1,7 @@
 import { buildBabyjub, buildMimc7 } from 'circomlibjs'
 import { utils } from 'ethers'
 import eddsaSign from './eddsaSign'
-import getSignatureInputs from './getSignatureInputs'
+import getNonceInputs from './getNonceInputs'
 
 async function inputsForMessage(message: string, suffix: string) {
   const babyJub = await buildBabyjub()
@@ -27,6 +27,6 @@ export default async function (
   return {
     ...(await inputsForMessage(ownerAddress, 'Address')),
     ...(await inputsForMessage(`${ownerAddress}ownsfarcaster`, 'Farcaster')),
-    ...(await getSignatureInputs()),
+    ...(await getNonceInputs()),
   }
 }
