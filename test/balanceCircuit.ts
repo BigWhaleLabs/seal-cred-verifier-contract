@@ -13,7 +13,7 @@ describe('BalanceChecker circuit', function () {
     this.baseInputs = await getBalanceInputs()
   })
 
-  it.only('should generate the witness successfully and return the correct nullifier', async function () {
+  it('should generate the witness successfully and return the correct nullifier', async function () {
     const witness = await this.circuit.calculateWitness(this.baseInputs)
     await this.circuit.assertOut(witness, {})
     // Check the nullifier
@@ -34,7 +34,7 @@ describe('BalanceChecker circuit', function () {
     )
     const witness = await this.circuit.calculateWitness(inputs)
     await this.circuit.assertOut(witness, {})
-    expect(witness[43]).to.be.deep.equal(BigNumber.from(0x6d))
+    expect(witness[3]).to.be.deep.equal(BigNumber.from(0x6d))
   })
   it('should return the correct network byte for goerli', async function () {
     const inputs = await getBalanceInputs(
@@ -46,7 +46,21 @@ describe('BalanceChecker circuit', function () {
     )
     const witness = await this.circuit.calculateWitness(inputs)
     await this.circuit.assertOut(witness, {})
-    expect(witness[43]).to.be.deep.equal(BigNumber.from(0x67))
+    expect(witness[3]).to.be.deep.equal(BigNumber.from(0x67))
+  })
+  it('should fail because the siblings is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      siblings: this.baseInputs.siblings.reverse(),
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
+  it('should fail because the pathIndices is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      pathIndices: new Array(this.baseInputs.siblings.length).fill(7),
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
   // Generate and test possible edge cases
   const testValues = [zero, '0x1', '0x6b87c4e204970e6', maxUInt256].map((v) =>
@@ -80,119 +94,107 @@ describe('BalanceChecker circuit', function () {
       await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
     })
   }
-  it('should fail because the messageToken is invalid', async function () {
+  it('should fail because the balanceMessage is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      messageToken: [
-        ...this.baseInputs.messageToken.slice(0, -1),
-        this.baseInputs.messageToken.at(-1) + 1,
+      balanceMessage: [
+        ...this.baseInputs.balanceMessage.slice(0, -1),
+        this.baseInputs.balanceMessage.at(-1) + 1,
       ],
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the messageAddress is invalid', async function () {
+  it('should fail because the addressPubKeyX is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      messageAddress: [
-        ...this.baseInputs.messageAddress.slice(0, -1),
-        this.baseInputs.messageAddress.at(-1) + 1,
-      ],
-    }
-    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
-  })
-  it('should fail because the pubKeyXToken is invalid', async function () {
-    const inputs = {
-      ...this.baseInputs,
-      pubKeyXToken:
+      addressPubKeyX:
         '64726898530325568278821246826665888375911357846978084992870462356218868841359',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the pubKeyXAddress is invalid', async function () {
+  it('should fail because the balancePubKeyX is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      pubKeyXAddress:
+      balancePubKeyX:
         '64726898530325568278821246826665888375911357846978084992870462356218868841359',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the pubKeyYToken is invalid', async function () {
+  it('should fail because the addressPubKeyY is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      pubKeyYToken:
+      addressPubKeyY:
         '01900514876892057315890636833479887731419666119278979591965777251527504328920',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the pubKeyYAddress is invalid', async function () {
+  it('should fail because the balancePubKeyY is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      pubKeyYAddress:
+      balancePubKeyY:
         '01900514876892057315890636833479887731419666119278979591965777251527504328920',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the R8xToken is invalid', async function () {
+  it('should fail because the addressR8x is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      R8xToken:
+      addressR8x:
         '7212099666815118526535189261030936450885444553115640062674935038466053117366',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the R8xAddress is invalid', async function () {
+  it('should fail because the balanceR8x is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      R8xAddress:
+      balanceR8x:
         '7212099666815118526535189261030936450885444553115640062674935038466053117366',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the R8yToken is invalid', async function () {
+  it('should fail because the addressR8y is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      R8yToken:
+      addressR8y:
         '9964253695754355531317724758616639482828829535308446341320380897334391409050',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the R8yAddress is invalid', async function () {
+  it('should fail because the balanceR8y is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      R8yAddress:
+      balanceR8y:
         '9964253695754355531317724758616639482828829535308446341320380897334391409050',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the SToken is invalid', async function () {
+  it('should fail because the addressS is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      SToken:
+      addressS:
         '3950502661897335750133025420259312129467652226207505500353373422799432347',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the SAddress is invalid', async function () {
+  it('should fail because the balanceS is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      SAddress:
+      balanceS:
         '3950502661897335750133025420259312129467652226207505500353373422799432347',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the MToken is invalid', async function () {
+  it('should fail because the nonce is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      MToken:
-        '73413802277671090077825408377457349715196153372506772912948865981934166990',
+      nonce: this.baseInputs.nonce.reverse(),
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the MAddress is invalid', async function () {
+  it('should fail because the address is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
-      MAddress:
-        '73413802277671090077825408377457349715196153372506772912948865981934166990',
+      address: '0x425f473795b15fae7310cfb3b4ba8e0bfeffc421',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })

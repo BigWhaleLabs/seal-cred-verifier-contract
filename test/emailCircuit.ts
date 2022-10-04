@@ -17,7 +17,7 @@ describe('EmailOwnershipChecker circuit', function () {
     await this.circuit.assertOut(witness, {})
     // Check the nullifier
     const mimc = await buildMimcSponge()
-    const hash = mimc.multiHash([this.baseInputs.r2, this.baseInputs.s2])
+    const hash = mimc.multiHash(this.baseInputs.nonce)
     assert.equal(
       padZerosOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
       utils.hexlify(witness[91])
@@ -67,13 +67,6 @@ describe('EmailOwnershipChecker circuit', function () {
     const inputs = {
       ...this.baseInputs,
       S: '3950502661897335750133025420259312129467652226207505500353373422799432347',
-    }
-    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
-  })
-  it('should fail because the M is invalid', async function () {
-    const inputs = {
-      ...this.baseInputs,
-      M: '73413802277671090077825408377457349715196153372506772912948865981934166990',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
