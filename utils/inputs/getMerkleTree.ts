@@ -1,11 +1,13 @@
 import { BigNumber } from 'ethers'
 import { IncrementalMerkleTree } from '@zk-kit/incremental-merkle-tree'
-import { buildMimcSponge } from 'circomlibjs'
+import { buildBabyjub, buildMimc7 } from 'circomlibjs'
 
 export default async function (items: BigNumber[]) {
-  const mimcSponge = await buildMimcSponge()
+  const babyJub = await buildBabyjub()
+  const F = babyJub.F
+  const mimc7 = await buildMimc7()
   const tree = new IncrementalMerkleTree(
-    mimcSponge.multiHash.bind(mimcSponge),
+    (args) => F.toObject(mimc7.multiHash.bind(mimc7)(args)),
     20,
     BigInt(0)
   )

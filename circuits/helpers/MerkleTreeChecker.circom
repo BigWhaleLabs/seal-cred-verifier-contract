@@ -1,18 +1,18 @@
 pragma circom 2.0.4;
 
-include "../../node_modules/circomlib/circuits/mimcsponge.circom";
+include "../../node_modules/circomlib/circuits/mimc.circom";
 
 // Computes MiMC([left, right])
 template HashLeftRight() {
   signal input left;
   signal input right;
-  signal output hash;
 
-  component hasher = MiMCSponge(2, 220, 1);
-  hasher.ins[0] <== left;
-  hasher.ins[1] <== right;
-  hasher.k <== 0;
-  hash <== hasher.outs[0];
+  component mimc7 = MultiMiMC7(2, 91);
+  mimc7.k <== 0;
+  mimc7.in[0] <== left;
+  mimc7.in[1] <== right;
+
+  signal output hash <== mimc7.out;
 }
 
 // if s == 0 returns [in[0], in[1]]
@@ -47,8 +47,6 @@ template MerkleTreeChecker(levels) {
     hashers[i].left <== selectors[i].out[0];
     hashers[i].right <== selectors[i].out[1];
   }
-  log(root);
-  log(hashers[levels - 1].hash);
-  // TODO: fix this condition
-  // root === hashers[levels - 1].hash;
+  
+  root === hashers[levels - 1].hash;
 }
