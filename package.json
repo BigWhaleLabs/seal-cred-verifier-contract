@@ -28,9 +28,9 @@
     "prettify": "prettier --write .",
     "release": "np",
     "prepublishOnly": "yarn build && yarn tsc",
-    "compile-email": "scripts/compile-circuit.sh EmailOwnershipChecker email",
-    "compile-balance": "scripts/compile-circuit.sh BalanceChecker balance",
-    "compile-farcaster": "scripts/compile-circuit.sh FarcasterChecker farcaster",
+    "compile-email": "scripts/compile-circuit.sh EmailOwnershipChecker email 16",
+    "compile-balance": "scripts/compile-circuit.sh BalanceChecker balance 15",
+    "compile-farcaster": "scripts/compile-circuit.sh FarcasterChecker farcaster 15",
     "generate-inputs": "ts-node scripts/generate-inputs.ts"
   },
   "devDependencies": {
@@ -49,6 +49,7 @@
     "@types/node": "^18.7.17",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
+    "@zk-kit/incremental-merkle-tree": "^1.0.0",
     "chai": "^4.3.6",
     "circom_tester": "^0.0.18",
     "circomlib": "^2.0.5",

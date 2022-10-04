@@ -3,10 +3,10 @@ import { BigNumber, utils } from 'ethers'
 import { cwd } from 'process'
 import { resolve } from 'path'
 import { writeFileSync } from 'fs'
-import eddsaPrivateKeyBytes from '../utils/eddsaPrivateKeyBytes'
-import getBalanceInputs from '../utils/getBalanceInputs'
-import getEmailInputs from '../utils/getEmailInputs'
-import getFarcasterInputs from '../utils/getFarcasterInputs'
+import eddsaPrivateKeyBytes from '../utils/eddsa/eddsaPrivateKeyBytes'
+import getBalanceInputs from '../utils/inputs/getBalanceInputs'
+import getEmailInputs from '../utils/inputs/getEmailInputs'
+import getFarcasterInputs from '../utils/inputs/getFarcasterInputs'
 
 void (async () => {
   console.log('EdDSA private key', utils.hexlify(eddsaPrivateKeyBytes))
