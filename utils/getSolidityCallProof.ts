@@ -1,11 +1,18 @@
-import { resolve } from 'path'
-import { cwd } from 'process'
 import * as snarkjs from 'snarkjs'
+import { cwd } from 'process'
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
 
 export default async function (proofName: string) {
+  const proof = JSON.parse(
+    readFileSync(resolve(cwd(), 'build', `proof-${proofName}.json`), 'utf8')
+  )
+  const publicInputs = JSON.parse(
+    readFileSync(resolve(cwd(), 'build', `public-${proofName}.json`), 'utf8')
+  )
   const callDataString = await snarkjs.groth16.exportSolidityCallData(
-    require(resolve(cwd(), `build/proof-${proofName}.json`)),
-    require(resolve(cwd(), `build/public-${proofName}.json`))
+    proof,
+    publicInputs
   )
   const splitData = callDataString.split('],[')
   return {
