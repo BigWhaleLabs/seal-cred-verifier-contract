@@ -5,9 +5,8 @@ include "./helpers/EdDSAValidator.circom";
 
 template EmailOwnershipChecker() {
   var domainLength = 90;
-  var messageLength = 90;
   // Get message
-  signal input message[messageLength];
+  signal input message[domainLength];
   // Output domain
   signal output domain[domainLength];
   
@@ -20,25 +19,22 @@ template EmailOwnershipChecker() {
   signal input R8x;
   signal input R8y;
   signal input S;
-  signal input M;
 
-  component edDSAValidator = EdDSAValidator(messageLength);
+  component edDSAValidator = EdDSAValidator(domainLength);
   edDSAValidator.pubKeyX <== pubKeyX;
   edDSAValidator.pubKeyY <== pubKeyY;
   edDSAValidator.R8x <== R8x;
   edDSAValidator.R8y <== R8y;
   edDSAValidator.S <== S;
-  edDSAValidator.messageHash <== M;
-  for (var i = 0; i < messageLength; i++) {
+  for (var i = 0; i < domainLength; i++) {
     edDSAValidator.message[i] <== message[i];
   }
   // Create nullifier
-  signal input r2;
-  signal input s2;
+  signal input nonce[2];
 
   component nullifier = Nullify();
-  nullifier.r <== r2;
-  nullifier.s <== s2;
+  nullifier.r <== nonce[0];
+  nullifier.s <== nonce[1];
   
   signal output nullifierHash <== nullifier.nullifierHash;
 }
