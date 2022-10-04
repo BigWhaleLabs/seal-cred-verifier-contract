@@ -3,7 +3,7 @@ import { buildBabyjub, buildMimc7 } from 'circomlibjs'
 
 export default class {
   private babyJub: any
-  private F: any
+  F: any
   private mimc7: any
 
   async prepare() {
@@ -12,7 +12,10 @@ export default class {
     this.mimc7 = await buildMimc7()
     return this
   }
-  hash(elements: any[]) {
+  hash(elements: any[] | Uint8Array) {
     return this.F.toObject(this.mimc7.multiHash.bind(this.mimc7)(elements))
+  }
+  hashWithoutBabyJub(elements: any[] | Uint8Array) {
+    return this.mimc7.multiHash.bind(this.mimc7)(elements)
   }
 }

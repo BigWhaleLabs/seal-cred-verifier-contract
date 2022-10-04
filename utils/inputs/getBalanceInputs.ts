@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers'
-import { buildBabyjub, buildMimc7 } from 'circomlibjs'
+import Mimc7 from '../Mimc7'
 import eddsaSign from '../eddsa/eddsaSign'
 import getAddressSignatureInputs from './getAddressSignatureInputs'
 import getMerkleTreeInputs from './getMerkleTreeInputs'
@@ -11,8 +11,6 @@ async function getBalanceSignatureInputs(
   ownersMerkleRoot: string,
   threshold: string
 ) {
-  const babyJub = await buildBabyjub()
-  const F = babyJub.F
   const networkByte = utils.toUtf8Bytes(network)[0]
   const message = [
     0, // "owns" type of attestation
@@ -21,15 +19,15 @@ async function getBalanceSignatureInputs(
     networkByte,
     threshold,
   ].map((v) => BigNumber.from(v))
-  const mimc7 = await buildMimc7()
-  const hash = mimc7.multiHash(message)
+  const mimc7 = await new Mimc7().prepare()
+  const hash = mimc7.hashWithoutBabyJub(message)
   const { publicKey, signature } = await eddsaSign(hash)
   return {
     balanceMessage: message.map((n) => n.toHexString()),
-    balancePubKeyX: F.toObject(publicKey[0]).toString(),
-    balancePubKeyY: F.toObject(publicKey[1]).toString(),
-    balanceR8x: F.toObject(signature.R8[0]).toString(),
-    balanceR8y: F.toObject(signature.R8[1]).toString(),
+    balancePubKeyX: mimc7.F.toObject(publicKey[0]).toString(),
+    balancePubKeyY: mimc7.F.toObject(publicKey[1]).toString(),
+    balanceR8x: mimc7.F.toObject(signature.R8[0]).toString(),
+    balanceR8y: mimc7.F.toObject(signature.R8[1]).toString(),
     balanceS: signature.S.toString(),
   }
 }
