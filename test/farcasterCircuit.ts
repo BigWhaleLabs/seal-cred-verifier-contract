@@ -3,7 +3,7 @@ import { buildMimcSponge } from 'circomlibjs'
 import { utils } from 'ethers'
 import { wasm as wasmTester } from 'circom_tester'
 import expectAssertFailure from '../utils/expectAssertFailure'
-import getFarcasterInputs from '../utils/getFarcasterInputs'
+import getFarcasterInputs from '../utils/inputs/getFarcasterInputs'
 import padZerosOnLeftHexString from '../utils/padZerosOnLeftHexString'
 
 describe('FarcasterChecker circuit', function () {
@@ -18,7 +18,7 @@ describe('FarcasterChecker circuit', function () {
     await this.circuit.assertOut(witness, {})
     // Check the nullifier
     const mimc = await buildMimcSponge()
-    const hash = mimc.multiHash([inputs.r2, inputs.s2])
+    const hash = mimc.multiHash(inputs.nonce)
     assert.equal(
       padZerosOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
       utils.hexlify(witness[10])

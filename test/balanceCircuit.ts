@@ -4,7 +4,7 @@ import { buildMimcSponge } from 'circomlibjs'
 import { maxUInt256, zero } from '../utils/constants'
 import { wasm as wasmTester } from 'circom_tester'
 import expectAssertFailure from '../utils/expectAssertFailure'
-import getBalanceInputs from '../utils/getBalanceInputs'
+import getBalanceInputs from '../utils/inputs/getBalanceInputs'
 import padZerosOnLeftHexString from '../utils/padZerosOnLeftHexString'
 
 describe('BalanceChecker circuit', function () {
@@ -13,16 +13,15 @@ describe('BalanceChecker circuit', function () {
     this.baseInputs = await getBalanceInputs()
   })
 
-  it('should generate the witness successfully and return the correct nullifier', async function () {
-    const inputs = await getBalanceInputs()
-    const witness = await this.circuit.calculateWitness(inputs)
+  it.only('should generate the witness successfully and return the correct nullifier', async function () {
+    const witness = await this.circuit.calculateWitness(this.baseInputs)
     await this.circuit.assertOut(witness, {})
     // Check the nullifier
     const mimc = await buildMimcSponge()
-    const hash = mimc.multiHash([inputs.r2, inputs.s2])
+    const hash = mimc.multiHash(this.baseInputs.nonce)
     assert.equal(
       padZerosOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
-      utils.hexlify(witness[44])
+      utils.hexlify(witness[5])
     )
   })
   it('should return the correct network byte for mainnet', async function () {

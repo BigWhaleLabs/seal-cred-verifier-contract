@@ -3,7 +3,7 @@ import { buildMimcSponge } from 'circomlibjs'
 import { utils } from 'ethers'
 import { wasm as wasmTester } from 'circom_tester'
 import expectAssertFailure from '../utils/expectAssertFailure'
-import getEmailInputs from '../utils/getEmailInputs'
+import getEmailInputs from '../utils/inputs/getEmailInputs'
 import padZerosOnLeftHexString from '../utils/padZerosOnLeftHexString'
 
 describe('EmailOwnershipChecker circuit', function () {
