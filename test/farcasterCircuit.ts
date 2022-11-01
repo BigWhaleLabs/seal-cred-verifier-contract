@@ -47,6 +47,16 @@ describe('FarcasterChecker circuit', function () {
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
+  it('should fail because the merkle root in farcasterMessage is invalid', async function () {
+    const message = this.baseInputs.farcasterMessage
+    message[1] =
+      '0x0f365c9af0ab76cbc880ba04f287fd4dac5022eec6f5dcc3ebbe3abd5b2f6438'
+    const inputs = {
+      ...this.baseInputs,
+      farcasterMessage: message,
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
   it('should fail because the farcasterPubKeyX is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
