@@ -23,6 +23,20 @@ describe('FarcasterChecker circuit', function () {
       utils.hexlify(witness[11])
     )
   })
+  it('should fail because the siblings is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      siblings: this.baseInputs.siblings.reverse(),
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
+  it('should fail because the pathIndices is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      pathIndices: new Array(this.baseInputs.siblings.length).fill(7),
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
   it('should fail because the farcasterMessage is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
