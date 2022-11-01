@@ -104,6 +104,16 @@ describe('BalanceChecker circuit', function () {
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
+  it('should fail because the merkle root in balanceMessage is invalid', async function () {
+    const message = this.baseInputs.balanceMessage
+    message[1] =
+      '0x25467bc5101e722a993cd81390c550a7239974dc73479fb399603a2e3f75cf69'
+    const inputs = {
+      ...this.baseInputs,
+      balanceMessage: message,
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
   it('should fail because the addressPubKeyX is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
