@@ -2,6 +2,7 @@ pragma circom 2.0.4;
 
 include "./helpers/Nullify.circom";
 include "./helpers/EdDSAValidator.circom";
+include "./helpers/MerkleTreeChecker.circom";
 
 template FarcasterChecker() {
   var farcasterWordLength = 9;
@@ -11,8 +12,8 @@ template FarcasterChecker() {
   signal input address;
   // Export attestation type
   signal output attestationType <== farcasterMessage[0];
-  // Check if owner address is the same
-  farcasterMessage[1] === address;
+  // Owners MerkleRoot
+  signal ownersMerkleRoot <== farcasterMessage[1];
   // Export farcaster word
   signal output farcaster[farcasterWordLength];
   for (var i = 0; i < farcasterWordLength; i++) {
@@ -58,6 +59,18 @@ template FarcasterChecker() {
   nullifier.s <== nonce[1];
 
   signal output nullifierHash <== nullifier.nullifierHash;
+  // Check Merkle proof
+  var levels = 20;
+  signal input pathIndices[levels];
+  signal input siblings[levels];
+
+  component merkleTreeChecker = MerkleTreeChecker(levels);
+  merkleTreeChecker.leaf <== address;
+  merkleTreeChecker.root <== ownersMerkleRoot;
+  for (var i = 0; i < levels; i++) {
+    merkleTreeChecker.pathElements[i] <== siblings[i];
+    merkleTreeChecker.pathIndices[i] <== pathIndices[i];
+  }
 }
 
 component main{public [farcasterPubKeyX]} = FarcasterChecker();
