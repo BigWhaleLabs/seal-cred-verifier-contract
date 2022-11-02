@@ -23,6 +23,20 @@ describe('FarcasterChecker circuit', function () {
       utils.hexlify(witness[11])
     )
   })
+  it('should fail because the siblings is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      siblings: this.baseInputs.siblings.reverse(),
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
+  it('should fail because the pathIndices is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      pathIndices: new Array(this.baseInputs.siblings.length).fill(7),
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
   it('should fail because the farcasterMessage is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
@@ -30,6 +44,16 @@ describe('FarcasterChecker circuit', function () {
         ...this.baseInputs.farcasterMessage.slice(0, -1),
         this.baseInputs.farcasterMessage.at(-1) + 1,
       ],
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
+  it('should fail because the merkle root in farcasterMessage is invalid', async function () {
+    const message = this.baseInputs.farcasterMessage
+    message[1] =
+      '0x0f365c9af0ab76cbc880ba04f287fd4dac5022eec6f5dcc3ebbe3abd5b2f6438'
+    const inputs = {
+      ...this.baseInputs,
+      farcasterMessage: message,
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
