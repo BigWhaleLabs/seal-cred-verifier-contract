@@ -44,7 +44,7 @@ yarn snarkjs groth16 verify "pot/$1_verification_key.json" "build/public-$2.json
 yarn snarkjs zkey export solidityverifier "pot/$1_final.zkey" "contracts/$1Verifier.sol"
 
 # Change Solidity compiler version and contract name
-sed -i '' 's/0.6.11;/0.8.16;\n\nimport "@big-whale-labs\/versioned-contract\/contracts\/Versioned.sol";/' "contracts/$1Verifier.sol"
+sed -i '' 's/0.6.11;/0.8.17;\n\nimport "@big-whale-labs\/versioned-contract\/contracts\/Versioned.sol";/' "contracts/$1Verifier.sol"
 sed -i '' "s/contract Verifier {/contract $1Verifier is Versioned {\nconstructor(string memory _version) Versioned(_version) {}/" "contracts/$1Verifier.sol"
 yarn prettify
 
