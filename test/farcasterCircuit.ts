@@ -144,11 +144,4 @@ describe('FarcasterChecker circuit', function () {
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the address is invalid', async function () {
-    const inputs = {
-      ...this.baseInputs,
-      address: '0x425f473795b15fae7310cfb3b4ba8e0bfeffc421',
-    }
-    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
-  })
 })

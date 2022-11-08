@@ -1,7 +1,6 @@
 import { BigNumber, utils } from 'ethers'
 import { assert, expect } from 'chai'
 import { buildMimcSponge } from 'circomlibjs'
-import { maxUInt256, zero } from '../utils/constants'
 import { wasm as wasmTester } from 'circom_tester'
 import expectAssertFailure from '../utils/expectAssertFailure'
 import getBalanceInputs from '../utils/inputs/getBalanceInputs'
@@ -62,38 +61,6 @@ describe('BalanceChecker circuit', function () {
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  // Generate and test possible edge cases
-  const testValues = [zero, '0x1', '0x6b87c4e204970e6', maxUInt256].map((v) =>
-    BigNumber.from(v)
-  )
-  const resultsToInputs = {
-    success: [],
-    failure: [],
-  } as {
-    success: string[][]
-    failure: string[][]
-  }
-  for (const balance of testValues) {
-    for (const threshold of testValues) {
-      const inputs = balance.gte(threshold)
-        ? resultsToInputs.success
-        : resultsToInputs.failure
-      inputs.push([balance.toHexString(), threshold.toHexString()])
-    }
-  }
-  for (const [balance, threshold] of resultsToInputs.success) {
-    it(`should succeed for balance ${balance} and threshold ${threshold}`, async function () {
-      const inputs = await getBalanceInputs(balance, threshold)
-      const witness = await this.circuit.calculateWitness(inputs)
-      await this.circuit.assertOut(witness, {})
-    })
-  }
-  for (const [balance, threshold] of resultsToInputs.failure) {
-    it(`should fail for balance ${balance} and threshold ${threshold}`, async function () {
-      const inputs = await getBalanceInputs(balance, threshold)
-      await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
-    })
-  }
   it('should fail because the balanceMessage is invalid', async function () {
     const inputs = {
       ...this.baseInputs,
@@ -198,13 +165,6 @@ describe('BalanceChecker circuit', function () {
     const inputs = {
       ...this.baseInputs,
       nonce: this.baseInputs.nonce.reverse(),
-    }
-    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
-  })
-  it('should fail because the address is invalid', async function () {
-    const inputs = {
-      ...this.baseInputs,
-      address: '0x425f473795b15fae7310cfb3b4ba8e0bfeffc421',
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
