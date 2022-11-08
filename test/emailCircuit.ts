@@ -70,4 +70,11 @@ describe('EmailOwnershipChecker circuit', function () {
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
+  it('should fail because the nonce is invalid', async function () {
+    const inputs = {
+      ...this.baseInputs,
+      nonce: this.baseInputs.nonce.reverse(),
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
 })
