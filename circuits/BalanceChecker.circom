@@ -3,7 +3,7 @@ pragma circom 2.0.4;
 include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circomlib/circuits/comparators.circom";
 include "./helpers/Nullify.circom";
 include "./helpers/EdDSAValidator.circom";
-include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circuits/helpers/MerkleTreeChecker.circom";
+include "./helpers/MerkleTreeCheckerMiMC.circom";
 include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circuits/templates/SealHubValidator.circom";
 include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circuits/templates/PublicKeyChunksToNum.circom";
 
@@ -83,7 +83,7 @@ template BalanceChecker() {
   signal input ownersPathIndices[ownersLevels];
   signal input ownersSiblings[ownersLevels];
 
-  component merkleTreeChecker = MerkleTreeChecker(ownersLevels);
+  component merkleTreeChecker = MerkleTreeCheckerMiMC(ownersLevels);
   merkleTreeChecker.leaf <== address;
   merkleTreeChecker.root <== ownersMerkleRoot;
   for (var i = 0; i < ownersLevels; i++) {
