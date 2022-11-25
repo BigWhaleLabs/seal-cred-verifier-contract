@@ -78,14 +78,6 @@ template BalanceChecker() {
     publicKeyChunksToNum.pubKey[1][i] <== pubKey[1][i];
   }
   balancePubKeyX === publicKeyChunksToNum.publicKeyNum;
-  // Create nullifier
-  signal input nonce[2];
-  
-  component nullifier = Nullify();
-  nullifier.r <== nonce[0];
-  nullifier.s <== nonce[1];
-
-  signal output nullifierHash <== nullifier.nullifierHash;
   // Check Merkle proof
   var ownersLevels = 20;
   signal input ownersPathIndices[ownersLevels];
