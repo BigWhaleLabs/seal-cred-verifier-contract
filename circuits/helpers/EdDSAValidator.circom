@@ -1,7 +1,7 @@
 pragma circom 2.0.4;
 
-include "../../node_modules/circomlib/circuits/eddsamimc.circom";
-include "../../node_modules/circomlib/circuits/mimc.circom";
+include "../../node_modules/@big-whale-labs/seal-hub-verifier-template/circomlib/circuits/eddsamimc.circom";
+include "../../node_modules/@big-whale-labs/seal-hub-verifier-template/circomlib/circuits/mimc.circom";
 
 // Check if the EdDSA signature is valid
 template EdDSAValidator(messageLength) {
