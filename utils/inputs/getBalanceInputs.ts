@@ -1,13 +1,15 @@
 import { BigNumber, utils } from 'ethers'
 import { IncrementalMerkleTree } from '@zk-kit/incremental-merkle-tree'
-import { Input } from '../Input'
 import { buildPoseidon } from 'circomlibjs'
+import {
+  createMessage,
+  generateCommitment,
+  generateSignatureInputs,
+} from '@big-whale-labs/seal-hub-kit'
 import Mimc7 from '../Mimc7'
 import eddsaSign from '../eddsa/eddsaSign'
-import generateCommitment from './generateCommitment'
-import generateInputs from './generateInputs'
 import getMerkleTreeInputs from './getMerkleTreeInputs'
-import getNonceInputs from './getNonceInputs'
+import publicKeyToArraysSplitted from '../publicKeyToArraysSplitted'
 import wallet from '../wallet'
 
 async function getBalanceSignatureInputs(
@@ -37,8 +39,8 @@ async function getBalanceSignatureInputs(
   }
 }
 
-async function merkleTreeInputsForSig(signatureInputs: Input) {
-  const commitment = await generateCommitment(signatureInputs)
+async function getMerkleTreeInputsForSig(signature: string, message: string) {
+  const commitment = await generateCommitment(signature, message)
   const ninetyNineCommitments = Array(99)
     .fill(undefined)
     .map(() => BigNumber.from(utils.randomBytes(32)).toBigInt())
@@ -85,14 +87,21 @@ export default async function (
     [ownerAddress, ...otherAddresses],
     ownerAddress
   )
-  const signatureInputs = await generateInputs(
-    wallet,
-    `Signature for SealHub ${wallet.address}`
-  )
-  const merkleTree = await merkleTreeInputsForSig(signatureInputs)
+
+  const message = createMessage(wallet.address)
+  const signature = await wallet.signMessage(message)
+
+  const { r, s, U } = generateSignatureInputs(signature, message)
+  const signatureInputs = {
+    r,
+    s,
+    U,
+    pubKey: publicKeyToArraysSplitted(wallet.publicKey),
+  }
+
   return {
     ...signatureInputs,
-    ...merkleTree,
+    ...(await getMerkleTreeInputsForSig(signature, message)),
     ...(await getBalanceSignatureInputs(
       tokenAddress,
       network,
@@ -101,6 +110,5 @@ export default async function (
     )),
     ownersPathIndices: merkleTreeInputs.pathIndices,
     ownersSiblings: merkleTreeInputs.siblings,
-    nonce: getNonceInputs(),
   }
 }
