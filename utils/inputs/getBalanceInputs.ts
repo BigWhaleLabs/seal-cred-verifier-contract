@@ -7,6 +7,7 @@ import getNonceInputs from './getNonceInputs'
 
 async function getBalanceSignatureInputs(
   tokenAddress: string,
+  tokenId: string,
   network: 'g' | 'm',
   ownersMerkleRoot: string,
   threshold: string
@@ -15,6 +16,7 @@ async function getBalanceSignatureInputs(
   const message = [
     0, // "owns" type of attestation
     ownersMerkleRoot,
+    tokenId,
     tokenAddress,
     networkByte,
     threshold,
@@ -58,6 +60,7 @@ export default async function (
     '0x4E1617325eE68426C710F6a911792D74b61850BD',
   ],
   tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6',
+  tokenId = '0',
   network: 'g' | 'm' = 'g'
 ) {
   const merkleTreeInputs = await getMerkleTreeInputs(
@@ -68,6 +71,7 @@ export default async function (
     ...(await getAddressSignatureInputs(ownerAddress)),
     ...(await getBalanceSignatureInputs(
       tokenAddress,
+      tokenId,
       network,
       merkleTreeInputs.merkleRoot,
       threshold

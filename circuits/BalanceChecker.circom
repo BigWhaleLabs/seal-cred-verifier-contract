@@ -6,7 +6,7 @@ include "./helpers/EdDSAValidator.circom";
 include "./helpers/MerkleTreeChecker.circom";
 
 template BalanceChecker() {
-  var balanceMessageLength = 5;
+  var balanceMessageLength = 6;
   // Get messages
   signal input balanceMessage[balanceMessageLength];
   signal input address;
@@ -14,8 +14,9 @@ template BalanceChecker() {
   signal output attestationType <== balanceMessage[0];
   signal ownersMerkleRoot <== balanceMessage[1];
   signal output tokenAddress <== balanceMessage[2];
-  signal output network <== balanceMessage[3];
-  signal output threshold <== balanceMessage[4];
+  signal output tokenId <== balanceMessage[3];
+  signal output network <== balanceMessage[4];
+  signal output threshold <== balanceMessage[5];
   // Check if the EdDSA signature of token balance is valid
   signal input balancePubKeyX;
   signal input balancePubKeyY;
