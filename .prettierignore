@@ -12,3 +12,4 @@ input-*.json
 *verification_key.json
 public
 Verifier.ts
+contracts/*Verifier.sol
