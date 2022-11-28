@@ -116,7 +116,7 @@ describe('BalanceChecker circuit', function () {
     }
     await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
   })
-  it('should fail because the merkle root in tokenId is invalid', async function () {
+  it('should fail because the tokenId in balanceMessage is invalid', async function () {
     const message = this.baseInputs.balanceMessage
     message[2] = '0x1'
     const inputs = {
