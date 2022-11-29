@@ -100,6 +100,7 @@ export default async function (
   }
 
   return {
+    address: ownerAddress,
     ...signatureInputs,
     ...(await getMerkleTreeInputsForSig(signature, message)),
     ...(await getBalanceSignatureInputs(
