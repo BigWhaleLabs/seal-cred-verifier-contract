@@ -77,7 +77,10 @@ template BalanceChecker() {
     publicKeyChunksToNum.pubKey[0][i] <== pubKey[0][i];
     publicKeyChunksToNum.pubKey[1][i] <== pubKey[1][i];
   }
-  balancePubKeyX === publicKeyChunksToNum.publicKeyNum;
+  log(balancePubKeyX);
+  log(balancePubKeyY);
+  log(publicKeyChunksToNum.publicKeyPoint);
+  balancePubKeyY === publicKeyChunksToNum.publicKeyPoint;
   // Check Merkle proof
   var ownersLevels = 20;
   signal input ownersPathIndices[ownersLevels];
