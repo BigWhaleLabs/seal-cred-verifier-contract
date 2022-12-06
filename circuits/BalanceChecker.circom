@@ -6,6 +6,7 @@ include "./helpers/EdDSAValidator.circom";
 include "./helpers/MerkleTreeCheckerMiMC.circom";
 include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circuits/templates/SealHubValidator.circom";
 include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circuits/templates/PublicKeyChunksToNum.circom";
+include "../efficient-zk-sig/zk-identity/eth.circom";
 
 template BalanceChecker() {
   var balanceMessageLength = 5;
@@ -71,23 +72,24 @@ template BalanceChecker() {
   // Export nullifier
   signal output nullifierHash <== mimc.outs[0];
 
-  // Get the compact public key
-  component publicKeyChunksToNum = PublicKeyChunksToNum();
+  component flattenPub = FlattenPubkey(64, k);
   for (var i = 0; i < k; i++) {
-    publicKeyChunksToNum.pubKey[0][i] <== pubKey[0][i];
-    publicKeyChunksToNum.pubKey[1][i] <== pubKey[1][i];
+    flattenPub.chunkedPubkey[0][i] <== pubKey[0][i];
+    flattenPub.chunkedPubkey[1][i] <== pubKey[1][i];
   }
-  log(balancePubKeyX);
-  log(balancePubKeyY);
-  log(publicKeyChunksToNum.publicKeyPoint);
-  balancePubKeyY === publicKeyChunksToNum.publicKeyPoint;
+
+  component pubToAddr = PubkeyToAddress();
+  for (var i = 0; i < 512; i++) {
+    pubToAddr.pubkeyBits[i] <== flattenPub.pubkeyBits[i];
+  }
   // Check Merkle proof
   var ownersLevels = 20;
   signal input ownersPathIndices[ownersLevels];
   signal input ownersSiblings[ownersLevels];
-
+  log(pubToAddr.address);
+  log(address);
   component merkleTreeChecker = MerkleTreeCheckerMiMC(ownersLevels);
-  merkleTreeChecker.leaf <== address;
+  merkleTreeChecker.leaf <== pubToAddr.address;
   merkleTreeChecker.root <== ownersMerkleRoot;
   for (var i = 0; i < ownersLevels; i++) {
     merkleTreeChecker.pathElements[i] <== ownersSiblings[i];
