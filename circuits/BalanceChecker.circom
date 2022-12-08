@@ -86,10 +86,8 @@ template BalanceChecker() {
   var ownersLevels = 20;
   signal input ownersPathIndices[ownersLevels];
   signal input ownersSiblings[ownersLevels];
-  log(pubToAddr.address);
-  log(address);
   component merkleTreeChecker = MerkleTreeCheckerMiMC(ownersLevels);
-  merkleTreeChecker.leaf <== pubToAddr.address;
+  merkleTreeChecker.leaf <== address;
   merkleTreeChecker.root <== ownersMerkleRoot;
   for (var i = 0; i < ownersLevels; i++) {
     merkleTreeChecker.pathElements[i] <== ownersSiblings[i];
