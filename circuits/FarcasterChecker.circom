@@ -2,7 +2,7 @@ pragma circom 2.0.4;
 
 include "./templates/Nullify.circom";
 include "./templates/EdDSAValidator.circom";
-include "./templates/MerkleTreeChecker.circom";
+include "./templates/MerkleTreeCheckerMiMC.circom";
 
 template FarcasterChecker() {
   var farcasterWordLength = 9;
@@ -64,7 +64,7 @@ template FarcasterChecker() {
   signal input pathIndices[levels];
   signal input siblings[levels];
 
-  component merkleTreeChecker = MerkleTreeChecker(levels);
+  component merkleTreeChecker = MerkleTreeCheckerMiMC(levels);
   merkleTreeChecker.leaf <== address;
   merkleTreeChecker.root <== ownersMerkleRoot;
   for (var i = 0; i < levels; i++) {
