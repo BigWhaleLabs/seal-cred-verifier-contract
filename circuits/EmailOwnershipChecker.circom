@@ -1,7 +1,7 @@
 pragma circom 2.0.4;
 
-include "./helpers/Nullify.circom";
-include "./helpers/EdDSAValidator.circom";
+include "./templates/Nullify.circom";
+include "./templates/EdDSAValidator.circom";
 
 template EmailOwnershipChecker() {
   var domainLength = 90;

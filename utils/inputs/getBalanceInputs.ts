@@ -1,11 +1,15 @@
 import { BigNumber, utils } from 'ethers'
+import {
+  getCommitmentFromSignature,
+  getMessageForAddress,
+  getSealHubValidatorInputs,
+} from '@big-whale-labs/seal-hub-kit'
 import Mimc7 from '../Mimc7'
 import eddsaSign from '../eddsa/eddsaSign'
-import getAddressSignatureInputs from './getAddressSignatureInputs'
 import getMerkleTreeInputs from './getMerkleTreeInputs'
-import getNonceInputs from './getNonceInputs'
+import wallet from '../wallet'
 
-async function getBalanceSignatureInputs(
+async function getBalanceAttestationInputs(
   tokenAddress: string,
   tokenId: string,
   network: 'g' | 'm',
@@ -16,8 +20,8 @@ async function getBalanceSignatureInputs(
   const message = [
     0, // "owns" type of attestation
     ownersMerkleRoot,
-    tokenId,
     tokenAddress,
+    tokenId,
     networkByte,
     threshold,
   ].map((v) => BigNumber.from(v))
@@ -36,7 +40,7 @@ async function getBalanceSignatureInputs(
 
 export default async function (
   threshold = '0x1',
-  ownerAddress = '0xbf74483DB914192bb0a9577f3d8Fb29a6d4c08eE',
+  ownerAddress = wallet.address,
   otherAddresses = [
     '0x8ac28b06fC1eEAA8646c0d8A5e835B96e93D6799',
     '0xdb2BA58f1CB7b10698A9Be268cB846809F0B05e4',
@@ -60,24 +64,44 @@ export default async function (
     '0x4E1617325eE68426C710F6a911792D74b61850BD',
   ],
   tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6',
-  tokenId = '0',
+  tokenId = '0x0',
   network: 'g' | 'm' = 'g'
 ) {
+  // Get SealHub validator inputs
+  const message = getMessageForAddress(wallet.address)
+  const signature = await wallet.signMessage(message)
+  const commitment = await getCommitmentFromSignature(signature, message)
+  const allCommitments = [
+    ...Array(99)
+      .fill(undefined)
+      .map(() => BigNumber.from(utils.randomBytes(32)).toBigInt()),
+    commitment,
+  ]
+  const sealHubValidatorInputs = await getSealHubValidatorInputs(
+    signature,
+    message,
+    undefined,
+    allCommitments
+  )
+  // Get balance verification inputs
   const merkleTreeInputs = await getMerkleTreeInputs(
     [ownerAddress, ...otherAddresses],
     ownerAddress
   )
   return {
-    ...(await getAddressSignatureInputs(ownerAddress)),
-    ...(await getBalanceSignatureInputs(
+    sealHubPathIndices: sealHubValidatorInputs.pathIndices,
+    sealHubSiblings: sealHubValidatorInputs.siblings,
+    sealHubU: sealHubValidatorInputs.U,
+    sealHubS: sealHubValidatorInputs.s,
+    sealHubAddress: sealHubValidatorInputs.address,
+    ...(await getBalanceAttestationInputs(
       tokenAddress,
       tokenId,
       network,
       merkleTreeInputs.merkleRoot,
       threshold
     )),
-    pathIndices: merkleTreeInputs.pathIndices,
-    siblings: merkleTreeInputs.siblings,
-    nonce: getNonceInputs(),
+    ownersPathIndices: merkleTreeInputs.pathIndices,
+    ownersSiblings: merkleTreeInputs.siblings,
   }
 }

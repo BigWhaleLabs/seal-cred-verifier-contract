@@ -1,15 +1,17 @@
 pragma circom 2.0.4;
 
-include "../node_modules/circomlib/circuits/comparators.circom";
-include "./helpers/Nullify.circom";
-include "./helpers/EdDSAValidator.circom";
-include "./helpers/MerkleTreeChecker.circom";
+include "../node_modules/circomlib/circuits/mimcsponge.circom";
+include "./templates/EdDSAValidator.circom";
+include "./templates/MerkleTreeCheckerMiMC.circom";
+include "./templates/SealHubValidator.circom";
 
+// This circuit verifies two proofs:
+// 1. The user knows precommitment to sealHubAddress on SealHub (proxy of Ethereum address ownership)
+// 2. The sealHubAddress is a part of a specific balance attestation from SealCred attestor
 template BalanceChecker() {
   var balanceMessageLength = 6;
-  // Get messages
+  // Get balance attestation message
   signal input balanceMessage[balanceMessageLength];
-  signal input address;
   // Gather signals
   signal output attestationType <== balanceMessage[0];
   signal ownersMerkleRoot <== balanceMessage[1];
@@ -17,7 +19,7 @@ template BalanceChecker() {
   signal output tokenId <== balanceMessage[3];
   signal output network <== balanceMessage[4];
   signal output threshold <== balanceMessage[5];
-  // Check if the EdDSA signature of token balance is valid
+  // Check balance attestation validity
   signal input balancePubKeyX;
   signal input balancePubKeyY;
   signal input balanceR8x;
@@ -33,41 +35,52 @@ template BalanceChecker() {
   for (var i = 0; i < balanceMessageLength; i++) {
     edDSAValidatorToken.message[i] <== balanceMessage[i];
   }
-  // Check if the EdDSA signature of address is valid
-  signal input addressPubKeyX;
-  signal input addressPubKeyY;
-  signal input addressR8x;
-  signal input addressR8y;
-  signal input addressS;
+  // Verify SealHub commitment
+  var k = 4;
+  var sealHubDepth = 30;
+  signal input sealHubS[k];
+  signal input sealHubU[2][k];
+  signal input sealHubAddress;
+  signal input sealHubPathIndices[sealHubDepth];
+  signal input sealHubSiblings[sealHubDepth];
 
-  component edDSAValidatorAddress = EdDSAValidator(1);
-  edDSAValidatorAddress.pubKeyX <== addressPubKeyX;
-  edDSAValidatorAddress.pubKeyY <== addressPubKeyY;
-  edDSAValidatorAddress.R8x <== addressR8x;
-  edDSAValidatorAddress.R8y <== addressR8y;
-  edDSAValidatorAddress.S <== addressS;
-  edDSAValidatorAddress.message[0] <== address;
-  // Check if attestors are the same
-  balancePubKeyX === addressPubKeyX;
-  // Create nullifier
-  signal input nonce[2];
-  
-  component nullifier = Nullify();
-  nullifier.r <== nonce[0];
-  nullifier.s <== nonce[1];
+  component sealHubValidator = SealHubValidator();
+  for (var i = 0; i < k; i++) {
+    sealHubValidator.s[i] <== sealHubS[i];
+    sealHubValidator.U[0][i] <== sealHubU[0][i];
+    sealHubValidator.U[1][i] <== sealHubU[1][i];
+  }
+  sealHubValidator.address <== sealHubAddress;
+  for (var i = 0; i < sealHubDepth; i++) {
+    sealHubValidator.pathIndices[i] <== sealHubPathIndices[i];
+    sealHubValidator.siblings[i] <== sealHubSiblings[i];
+  }
+  // Export Merkle root
+  signal output sealHubMerkleRoot <== sealHubValidator.merkleRoot;
 
-  signal output nullifierHash <== nullifier.nullifierHash;
+  // Compute nullifier
+  component nullifierMimc = MiMCSponge(3 * k + 2, 220, 1);
+  nullifierMimc.k <== 0;
+  for (var i = 0; i < k; i++) {
+    nullifierMimc.ins[i] <== sealHubS[i];
+    nullifierMimc.ins[k + i] <== sealHubU[0][i];
+    nullifierMimc.ins[2 * k + i] <== sealHubU[1][i];
+  }
+  nullifierMimc.ins[3 * k] <== sealHubAddress;
+  nullifierMimc.ins[3 * k + 1] <== 110852321604106932801557041130035372901; // "SealCred Balance" in decimal
+  // Export nullifier
+  signal output nullifier <== nullifierMimc.outs[0];
+
   // Check Merkle proof
-  var levels = 20;
-  signal input pathIndices[levels];
-  signal input siblings[levels];
-
-  component merkleTreeChecker = MerkleTreeChecker(levels);
-  merkleTreeChecker.leaf <== address;
+  var balanceAttestationDepth = 20;
+  signal input ownersPathIndices[balanceAttestationDepth];
+  signal input ownersSiblings[balanceAttestationDepth];
+  component merkleTreeChecker = MerkleTreeCheckerMiMC(balanceAttestationDepth);
+  merkleTreeChecker.leaf <== sealHubAddress;
   merkleTreeChecker.root <== ownersMerkleRoot;
-  for (var i = 0; i < levels; i++) {
-    merkleTreeChecker.pathElements[i] <== siblings[i];
-    merkleTreeChecker.pathIndices[i] <== pathIndices[i];
+  for (var i = 0; i < balanceAttestationDepth; i++) {
+    merkleTreeChecker.pathElements[i] <== ownersSiblings[i];
+    merkleTreeChecker.pathIndices[i] <== ownersPathIndices[i];
   }
 }
 
