@@ -40,7 +40,7 @@ async function getBalanceAttestationInputs(
 
 export default async function (
   threshold = '0x1',
-  ownerAddress = '0xbf74483DB914192bb0a9577f3d8Fb29a6d4c08eE',
+  ownerAddress = wallet.address,
   otherAddresses = [
     '0x8ac28b06fC1eEAA8646c0d8A5e835B96e93D6799',
     '0xdb2BA58f1CB7b10698A9Be268cB846809F0B05e4',
