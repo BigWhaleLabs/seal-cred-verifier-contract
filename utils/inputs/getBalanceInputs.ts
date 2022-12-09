@@ -2,17 +2,16 @@ import { BigNumber, utils } from 'ethers'
 import { IncrementalMerkleTree } from '@zk-kit/incremental-merkle-tree'
 import { buildPoseidon } from 'circomlibjs'
 import {
-  createMessage,
-  generateCommitment,
-  generateSignatureInputs,
+  getCommitmentFromSignature,
+  getMessageForAddress,
+  getSealHubValidatorInputs,
 } from '@big-whale-labs/seal-hub-kit'
 import Mimc7 from '../Mimc7'
 import eddsaSign from '../eddsa/eddsaSign'
 import getMerkleTreeInputs from './getMerkleTreeInputs'
-import publicKeyToArraysSplitted from '../publicKeyToArraysSplitted'
 import wallet from '../wallet'
 
-async function getBalanceSignatureInputs(
+async function getBalanceAttestationInputs(
   tokenAddress: string,
   network: 'g' | 'm',
   ownersMerkleRoot: string,
@@ -36,22 +35,6 @@ async function getBalanceSignatureInputs(
     balanceR8x: mimc7.F.toObject(signature.R8[0]).toString(),
     balanceR8y: mimc7.F.toObject(signature.R8[1]).toString(),
     balanceS: signature.S.toString(),
-  }
-}
-
-async function getMerkleTreeInputsForSig(signature: string, message: string) {
-  const commitment = await generateCommitment(signature, message)
-  const ninetyNineCommitments = Array(99)
-    .fill(undefined)
-    .map(() => BigNumber.from(utils.randomBytes(32)).toBigInt())
-  const poseidon = await buildPoseidon()
-  const tree = new IncrementalMerkleTree(poseidon, 30, BigInt(0), 2)
-  ninetyNineCommitments.forEach((c) => tree.insert(c))
-  tree.insert(commitment)
-  const proof = tree.createProof(99)
-  return {
-    pathIndices: proof.pathIndices,
-    siblings: proof.siblings.map(([s]) => BigNumber.from(s).toHexString()),
   }
 }
 
@@ -83,27 +66,34 @@ export default async function (
   tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6',
   network: 'g' | 'm' = 'g'
 ) {
+  // Get SealHub validator inputs
+  const message = getMessageForAddress(wallet.address)
+  const signature = await wallet.signMessage(message)
+  const commitment = await getCommitmentFromSignature(signature, message)
+  const allCommitments = [
+    ...Array(99)
+      .fill(undefined)
+      .map(() => BigNumber.from(utils.randomBytes(32)).toBigInt()),
+    commitment,
+  ]
+  const sealHubValidatorInputs = await getSealHubValidatorInputs(
+    signature,
+    message,
+    undefined,
+    allCommitments
+  )
+  // Get balance verification inputs
   const merkleTreeInputs = await getMerkleTreeInputs(
     [ownerAddress, ...otherAddresses],
     ownerAddress
   )
-
-  const message = createMessage(wallet.address)
-  const signature = await wallet.signMessage(message)
-
-  const { r, s, U } = generateSignatureInputs(signature, message)
-  const signatureInputs = {
-    r,
-    s,
-    U,
-    pubKey: publicKeyToArraysSplitted(wallet.publicKey),
-  }
-
   return {
-    address: ownerAddress,
-    ...signatureInputs,
-    ...(await getMerkleTreeInputsForSig(signature, message)),
-    ...(await getBalanceSignatureInputs(
+    sealHubPathIndices: sealHubValidatorInputs.pathIndices,
+    sealHubSiblings: sealHubValidatorInputs.siblings,
+    sealHubU: sealHubValidatorInputs.U,
+    sealHubS: sealHubValidatorInputs.s,
+    sealHubAddress: sealHubValidatorInputs.address,
+    ...(await getBalanceAttestationInputs(
       tokenAddress,
       network,
       merkleTreeInputs.merkleRoot,

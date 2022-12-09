@@ -1,8 +1,8 @@
 pragma circom 2.0.4;
 
-include "./helpers/Nullify.circom";
-include "./helpers/EdDSAValidator.circom";
-include "./helpers/MerkleTreeChecker.circom";
+include "./templates/Nullify.circom";
+include "./templates/EdDSAValidator.circom";
+include "./templates/MerkleTreeChecker.circom";
 
 template FarcasterChecker() {
   var farcasterWordLength = 9;

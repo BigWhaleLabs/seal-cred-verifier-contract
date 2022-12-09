@@ -1,25 +1,24 @@
 pragma circom 2.0.4;
 
-include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circomlib/circuits/comparators.circom";
-include "./helpers/Nullify.circom";
-include "./helpers/EdDSAValidator.circom";
-include "./helpers/MerkleTreeCheckerMiMC.circom";
-include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circuits/templates/SealHubValidator.circom";
-include "../node_modules/@big-whale-labs/seal-hub-verifier-template/circuits/templates/PublicKeyChunksToNum.circom";
-include "../efficient-zk-sig/zk-identity/eth.circom";
+include "../node_modules/circomlib/circuits/mimcsponge.circom";
+include "./templates/EdDSAValidator.circom";
+include "./templates/MerkleTreeCheckerMiMC.circom";
+include "./templates/SealHubValidator.circom";
 
+// This circuit verifies two proofs:
+// 1. The user knows precommitment to sealHubAddress on SealHub (proxy of Ethereum address ownership)
+// 2. The sealHubAddress is a part of a specific balance attestation from SealCred attestor
 template BalanceChecker() {
   var balanceMessageLength = 5;
-  // Get messages
+  // Get balance attestation message
   signal input balanceMessage[balanceMessageLength];
-  signal input address;
   // Gather signals
   signal output attestationType <== balanceMessage[0];
   signal ownersMerkleRoot <== balanceMessage[1];
   signal output tokenAddress <== balanceMessage[2];
   signal output network <== balanceMessage[3];
   signal output threshold <== balanceMessage[4];
-  // Check if the EdDSA signature of token balance is valid
+  // Check balance attestation validity
   signal input balancePubKeyX;
   signal input balancePubKeyY;
   signal input balanceR8x;
@@ -35,61 +34,50 @@ template BalanceChecker() {
   for (var i = 0; i < balanceMessageLength; i++) {
     edDSAValidatorToken.message[i] <== balanceMessage[i];
   }
-  var k = 4;
-  var levels = 30;
-  // Get inputs, *never* export them publicly
-  signal input r[k]; // Pre-commitment signature
-  signal input s[k]; // Pre-commitment signature
-  signal input U[2][k]; // Pre-commitment signature
-  signal input pubKey[2][k]; // Pre-commitment public key
-  signal input pathIndices[levels]; // Merkle proof that commitment is a part of the Merkle tree
-  signal input siblings[levels]; // Merkle proof that commitment is a part of the Merkle tree
   // Verify SealHub commitment
+  var k = 4;
+  var sealHubDepth = 30;
+  signal input sealHubS[k];
+  signal input sealHubU[2][k];
+  signal input sealHubAddress;
+  signal input sealHubPathIndices[sealHubDepth];
+  signal input sealHubSiblings[sealHubDepth];
+
   component sealHubValidator = SealHubValidator();
   for (var i = 0; i < k; i++) {
-    sealHubValidator.s[i] <== s[i];
-    sealHubValidator.U[0][i] <== U[0][i];
-    sealHubValidator.U[1][i] <== U[1][i];
-    sealHubValidator.pubKey[0][i] <== pubKey[0][i];
-    sealHubValidator.pubKey[1][i] <== pubKey[1][i];
+    sealHubValidator.s[i] <== sealHubS[i];
+    sealHubValidator.U[0][i] <== sealHubU[0][i];
+    sealHubValidator.U[1][i] <== sealHubU[1][i];
   }
-  for (var i = 0; i < levels; i++) {
-    sealHubValidator.pathIndices[i] <== pathIndices[i];
-    sealHubValidator.siblings[i] <== siblings[i];
+  sealHubValidator.address <== sealHubAddress;
+  for (var i = 0; i < sealHubDepth; i++) {
+    sealHubValidator.pathIndices[i] <== sealHubPathIndices[i];
+    sealHubValidator.siblings[i] <== sealHubSiblings[i];
   }
   // Export Merkle root
-  signal output merkleRoot <== sealHubValidator.merkleRoot;
+  signal output sealHubMerkleRoot <== sealHubValidator.merkleRoot;
 
   // Compute nullifier
-  component mimc = MiMCSponge(2 * k + 2, 220, 1);
+  component nullifierMimc = MiMCSponge(3 * k + 2, 220, 1);
+  nullifierMimc.k <== 0;
   for (var i = 0; i < k; i++) {
-    mimc.ins[i] <== r[i];
-    mimc.ins[i + k] <== s[i];
+    nullifierMimc.ins[i] <== sealHubS[i];
+    nullifierMimc.ins[k + i] <== sealHubU[0][i];
+    nullifierMimc.ins[2 * k + i] <== sealHubU[1][i];
   }
-  mimc.ins[2 * k] <== 420;
-  mimc.ins[2 * k + 1] <== 69;
-  mimc.k <== 0;
+  nullifierMimc.ins[3 * k] <== sealHubAddress;
+  nullifierMimc.ins[3 * k + 1] <== 110852321604106932801557041130035372901; // "SealCred Balance" in decimal
   // Export nullifier
-  signal output nullifierHash <== mimc.outs[0];
+  signal output nullifier <== nullifierMimc.outs[0];
 
-  component flattenPub = FlattenPubkey(64, k);
-  for (var i = 0; i < k; i++) {
-    flattenPub.chunkedPubkey[0][i] <== pubKey[0][i];
-    flattenPub.chunkedPubkey[1][i] <== pubKey[1][i];
-  }
-
-  component pubToAddr = PubkeyToAddress();
-  for (var i = 0; i < 512; i++) {
-    pubToAddr.pubkeyBits[i] <== flattenPub.pubkeyBits[i];
-  }
   // Check Merkle proof
-  var ownersLevels = 20;
-  signal input ownersPathIndices[ownersLevels];
-  signal input ownersSiblings[ownersLevels];
-  component merkleTreeChecker = MerkleTreeCheckerMiMC(ownersLevels);
-  merkleTreeChecker.leaf <== address;
+  var balanceAttestationDepth = 20;
+  signal input ownersPathIndices[balanceAttestationDepth];
+  signal input ownersSiblings[balanceAttestationDepth];
+  component merkleTreeChecker = MerkleTreeCheckerMiMC(balanceAttestationDepth);
+  merkleTreeChecker.leaf <== sealHubAddress;
   merkleTreeChecker.root <== ownersMerkleRoot;
-  for (var i = 0; i < ownersLevels; i++) {
+  for (var i = 0; i < balanceAttestationDepth; i++) {
     merkleTreeChecker.pathElements[i] <== ownersSiblings[i];
     merkleTreeChecker.pathIndices[i] <== ownersPathIndices[i];
   }

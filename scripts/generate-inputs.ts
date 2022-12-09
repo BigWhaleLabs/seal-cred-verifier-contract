@@ -15,9 +15,9 @@ void (async () => {
     BigNumber.from(await ed.getPublicKey(eddsaPrivateKeyBytes)).toString()
   )
   const inputs = {
-    email: getEmailInputs,
+    // email: getEmailInputs,
     balance: getBalanceInputs,
-    farcaster: getFarcasterInputs,
+    // farcaster: getFarcasterInputs,
   }
   for (const [name, fn] of Object.entries(inputs)) {
     const inputs = await fn()
