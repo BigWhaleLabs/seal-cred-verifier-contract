@@ -66,6 +66,9 @@ template FarcasterChecker() {
   }
   nullifierMimc.ins[3 * k] <== sealHubAddress;
   nullifierMimc.ins[3 * k + 1] <== 7264817748646751948082916036165286355035506; // "SealCred Farcaster" in decimal
+  // Export nullifier
+  signal output nullifier <== nullifierMimc.outs[0];
+  
   // Check Merkle proof
   var levels = 20;
   signal input ownersPathIndices[levels];
