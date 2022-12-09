@@ -1,6 +1,4 @@
 import { BigNumber, utils } from 'ethers'
-import { IncrementalMerkleTree } from '@zk-kit/incremental-merkle-tree'
-import { buildPoseidon } from 'circomlibjs'
 import {
   getCommitmentFromSignature,
   getMessageForAddress,
@@ -13,6 +11,7 @@ import wallet from '../wallet'
 
 async function getBalanceAttestationInputs(
   tokenAddress: string,
+  tokenId: string,
   network: 'g' | 'm',
   ownersMerkleRoot: string,
   threshold: string
@@ -22,6 +21,7 @@ async function getBalanceAttestationInputs(
     0, // "owns" type of attestation
     ownersMerkleRoot,
     tokenAddress,
+    tokenId,
     networkByte,
     threshold,
   ].map((v) => BigNumber.from(v))
@@ -64,6 +64,7 @@ export default async function (
     '0x4E1617325eE68426C710F6a911792D74b61850BD',
   ],
   tokenAddress = '0x722B0676F457aFe13e479eB2a8A4De88BA15B2c6',
+  tokenId = '0x0',
   network: 'g' | 'm' = 'g'
 ) {
   // Get SealHub validator inputs
@@ -95,6 +96,7 @@ export default async function (
     sealHubAddress: sealHubValidatorInputs.address,
     ...(await getBalanceAttestationInputs(
       tokenAddress,
+      tokenId,
       network,
       merkleTreeInputs.merkleRoot,
       threshold

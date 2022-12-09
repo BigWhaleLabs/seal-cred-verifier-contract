@@ -20,7 +20,7 @@ describe('BalanceChecker circuit', function () {
     const hash = mimc.multiHash(this.baseInputs.nonce)
     assert.equal(
       padZerosOnLeftHexString(`0x${mimc.F.toString(hash, 16)}`, 66),
-      utils.hexlify(witness[5])
+      utils.hexlify(witness[6])
     )
   })
   it('should return the correct network byte for mainnet', async function () {
@@ -29,14 +29,16 @@ describe('BalanceChecker circuit', function () {
       undefined,
       undefined,
       undefined,
+      undefined,
       'm'
     )
     const witness = await this.circuit.calculateWitness(inputs)
     await this.circuit.assertOut(witness, {})
-    expect(witness[3]).to.be.deep.equal(BigNumber.from(0x6d))
+    expect(witness[4]).to.be.deep.equal(BigNumber.from(0x6d))
   })
   it('should return the correct network byte for goerli', async function () {
     const inputs = await getBalanceInputs(
+      undefined,
       undefined,
       undefined,
       undefined,
@@ -45,7 +47,7 @@ describe('BalanceChecker circuit', function () {
     )
     const witness = await this.circuit.calculateWitness(inputs)
     await this.circuit.assertOut(witness, {})
-    expect(witness[3]).to.be.deep.equal(BigNumber.from(0x67))
+    expect(witness[4]).to.be.deep.equal(BigNumber.from(0x67))
   })
   it('should fail because the siblings is invalid', async function () {
     const inputs = {
@@ -75,6 +77,15 @@ describe('BalanceChecker circuit', function () {
     const message = this.baseInputs.balanceMessage
     message[1] =
       '0x25467bc5101e722a993cd81390c550a7239974dc73479fb399603a2e3f75cf69'
+    const inputs = {
+      ...this.baseInputs,
+      balanceMessage: message,
+    }
+    await expectAssertFailure(() => this.circuit.calculateWitness(inputs))
+  })
+  it('should fail because the tokenId in balanceMessage is invalid', async function () {
+    const message = this.baseInputs.balanceMessage
+    message[2] = '0x1'
     const inputs = {
       ...this.baseInputs,
       balanceMessage: message,

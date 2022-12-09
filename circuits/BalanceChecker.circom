@@ -9,15 +9,16 @@ include "./templates/SealHubValidator.circom";
 // 1. The user knows precommitment to sealHubAddress on SealHub (proxy of Ethereum address ownership)
 // 2. The sealHubAddress is a part of a specific balance attestation from SealCred attestor
 template BalanceChecker() {
-  var balanceMessageLength = 5;
+  var balanceMessageLength = 6;
   // Get balance attestation message
   signal input balanceMessage[balanceMessageLength];
   // Gather signals
   signal output attestationType <== balanceMessage[0];
   signal ownersMerkleRoot <== balanceMessage[1];
   signal output tokenAddress <== balanceMessage[2];
-  signal output network <== balanceMessage[3];
-  signal output threshold <== balanceMessage[4];
+  signal output tokenId <== balanceMessage[3];
+  signal output network <== balanceMessage[4];
+  signal output threshold <== balanceMessage[5];
   // Check balance attestation validity
   signal input balancePubKeyX;
   signal input balancePubKeyY;
